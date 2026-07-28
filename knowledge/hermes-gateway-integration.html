@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumentasi Arsitektur & Integrasi Teknis: Hermes Agentic Gateway</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: rgba(21, 29, 46, 0.7);
+            --bg-card-hover: rgba(29, 41, 66, 0.8);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.4);
+            
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px 24px;
+        }
+
+        header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .badge-system {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .badge-system::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-emerald);
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .sub-question {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-size: 0.98rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comp-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .comp-card.highlight {
+            border-color: var(--border-highlight);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .comp-card h4 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag-blue { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); }
+        .tag-purple { background: rgba(99, 102, 241, 0.2); color: var(--primary-light); }
+
+        pre {
+            background: #080c14;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 16px;
+            overflow-x: auto;
+            font-family: var(--font-code);
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            margin: 16px 0;
+        }
+
+        code {
+            font-family: var(--font-code);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: var(--accent-cyan);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-main);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-card);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-card);
+            color: var(--text-muted);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+        }
+
+        .flow-diagram {
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 36px;
+            bottom: -16px;
+            width: 2px;
+            background: var(--border-card);
+        }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            padding-top: 4px;
+        }
+
+        .step-title {
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .callout {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .callout-title {
+            color: var(--accent-emerald);
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-card);
+            padding-top: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="badge-system">HERMES GATEWAY SYSTEM ARCHITECTURE</div>
+        <h1>Spesifikasi Integrasi Hermes Agentic Gateway</h1>
+        <p class="subtitle">Dokumentasi teknis presisi tanpa asumsi spekulatif mengenai Session Management, Token Accounting, serta Storage & Memory Retention pada Hermes Agent Framework.</p>
+    </header>
+
+    <div class="grid">
+        
+        <!-- SECTION 1: SESSION MANAGEMENT -->
+        <section class="section-card">
+            <div class="section-header">
+                <div class="icon-box">01</div>
+                <h2>Session Management & Chat History</h2>
+            </div>
+
+            <div class="sub-question">
+                <h3>1.1 Pemetaan session_id & user_context (/api/sessions vs /v1/chat/completions)</h3>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4><span class="tag tag-blue">OpenAI Standard</span> /v1/chat/completions</h4>
+                    <p><strong>Mekanisme:</strong> <code>Stateless Protocol</code></p>
+                    <p>Endpoint ini mengikuti spesifikasi standar OpenAI API. Secara default, Hermes tidak mengikat request ke dalam database sesi persistent kecuali dipaksa melalui HTTP Header <code>X-Hermes-Session-Id</code> atau <code>X-Hermes-Session-Key</code>.</p>
+                    <p><strong>Handling user_context:</strong> Jika client mengoper objek custom seperti <code>user_context</code> di dalam body JSON, field ini diperlakukan sebagai bagian dari input prompt user yang dilewatkan ke LLM agent. Field ini <em>tidak disimpan</em> ke dalam tabel sesi <code>response_store.db</code>.</p>
+                </div>
+
+                <div class="comp-card highlight">
+                    <h4><span class="tag tag-purple">Hermes Native</span> /api/sessions</h4>
+                    <p><strong>Mekanisme:</strong> <code>Stateful Protocol</code></p>
+                    <p>Endpoint ini secara eksplisit menginisialisasi dan merekam sesi ke dalam SQLite database profile (<code>response_store.db</code> & <code>state.db</code>). Mengembalikan <code>session_id</code> unik berformat <code>api_{timestamp}_{hash}</code>.</p>
+                    <p><strong>Handling user_context:</strong> <code>user_context</code> terikat secara persistent pada konteks eksekusi agent melalui perantara <code>set_session_vars(session_key=..., session_id=...)</code> pada runtime <code>api_server.py</code>.</p>
+                </div>
+            </div>
+
+            <div class="sub-question">
+                <h3>1.2 Alur Memanggil Histori & Menyambung Percakapan</h3>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Inisialisasi Sesi Baru (POST /api/sessions)</div>
+                        <p>Client mengirimkan request untuk membuat sesi obrolan baru.</p>
+                        <pre><code>POST /api/sessions
+Host: 203.145.34.37:8643
+Content-Type: application/json
+
+{ "title": "Session Jovan - SA Modernization" }</code></pre>
+                        <p><em>Response Server:</em> Mengembalikan <code>session_id</code> (misal: <code>api_1785212211_12b5637c</code>).</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Kirim Pesan / Menyambung Chat (POST /api/sessions/{session_id}/chat)</div>
+                        <p>Setiap obrolan lanjutan dikirimkan ke endpoint sesi bersangkutan.</p>
+                        <pre><code>POST /api/sessions/api_1785212211_12b5637c/chat
+Content-Type: application/json
+
+{ "message": "Tolong buatkan DDL Flyway untuk tabel user_account" }</code></pre>
+                        <p><em>Proses Server:</em> Server memuat histori obrolan sebelumnya dari SQLite DB, mengikat variabel sesi via <code>_bind_api_server_session()</code>, menjalankan agent, lalu menyimpan pesan <code>user</code> dan respon <code>assistant</code> ke DB.</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Mengambil Seluruh Histori Pesan (GET /api/sessions/{session_id}/messages)</div>
+                        <p>Client dapat memanggil ulang seluruh riwayat percakapan kapan saja.</p>
+                        <pre><code>GET /api/sessions/api_1785212211_12b5637c/messages
+Authorization: Bearer <API_SERVER_KEY></code></pre>
+                        <p><em>Response JSON Server:</em></p>
+                        <pre><code>{
+  "object": "list",
+  "session_id": "api_1785212211_12b5637c",
+  "data": [
+    {
+      "id": 55,
+      "role": "user",
+      "content": "Halo, saya Jovan System Analyst...",
+      "timestamp": 1785212211.968
+    },
+    {
+      "id": 56,
+      "role": "assistant",
+      "content": "Halo Jovan! Dua tugas utamamu...",
+      "timestamp": 1785212214.120
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TOKEN ACCOUNTING -->
+        <section class="section-card">
+            <div class="section-header">
+                <div class="icon-box">02</div>
+                <h2>Token Accounting & Tracking</h2>
+            </div>
+
+            <div class="sub-question">
+                <h3>2.1 Otomatisasi Perhitungan & Akumulasi Token</h3>
+            </div>
+            <p><strong>Ya, Hermes secara otomatis menghitung dan mengumpulkan statistik token.</strong></p>
+            <p>Pada level runner Hermes Gateway (<code>api_server.py</code>), setiap siklus eksekusi agen melacak pemakaian token secara akurat dari provider LLM dan menyimpannya ke atribut objek agent:</p>
+            <ul>
+                <li><code>agent.session_prompt_tokens</code> (Input tokens)</li>
+                <li><code>agent.session_completion_tokens</code> (Output tokens)</li>
+                <li><code>agent.session_total_tokens</code> (Total gabungan)</li>
+            </ul>
+
+            <div class="sub-question">
+                <h3>2.2 Struktur JSON Response Usage</h3>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4>Response format <code>/v1/chat/completions</code></h4>
+                    <pre><code>{
+  "id": "chatcmpl-ba343ecc800a4efa9c86",
+  "object": "chat.completion",
+  "created": 1785168782,
+  "model": "system-analyst",
+  "choices": [...],
+  "usage": {
+    "prompt_tokens": 16650,
+    "completion_tokens": 315,
+    "total_tokens": 16965
+  }
+}</code></pre>
+                </div>
+
+                <div class="comp-card highlight">
+                    <h4>Response format <code>/api/sessions/{id}/chat</code> & <code>/v1/runs</code></h4>
+                    <pre><code>{
+  "result": {
+    "role": "assistant",
+    "content": "...",
+    "session_id": "api_1785212211_12b5637c"
+  },
+  "usage": {
+    "input_tokens": 16650,
+    "output_tokens": 315,
+    "total_tokens": 16965,
+    "runtime": 2.45
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: STORAGE & MEMORY RETENTION -->
+        <section class="section-card">
+            <div class="section-header">
+                <div class="icon-box">03</div>
+                <h2>Storage & Memory Retention</h2>
+            </div>
+
+            <div class="sub-question">
+                <h3>3.1 Lokasi Fisik Penyimpanan (Physical Storage Location)</h3>
+            </div>
+            <p>Hermes mengadopsi arsitektur <strong>Hybrid Storage</strong> berbasis <strong>SQLite 3</strong> dan <strong>File System JSON/Logs</strong> yang terisolasi per profile:</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipe Storage</th>
+                            <th>Path Fisik di Server</th>
+                            <th>Fungsi Utama</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>SQLite Database</strong></td>
+                            <td><code>~/.hermes/profiles/{profile}/response_store.db</code></td>
+                            <td>Menyimpan tabel <code>conversations</code> dan <code>responses</code> (payload pesan & metadata).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SQLite State DB</strong></td>
+                            <td><code>~/.hermes/profiles/{profile}/state.db</code></td>
+                            <td>Menyimpan metadata sesi runtime, registrasi channel, dan eksekusi cron.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>File System Dumps</strong></td>
+                            <td><code>~/.hermes/profiles/{profile}/sessions/*.json</code></td>
+                            <td>Dump JSON mentah request/response per turn obrolan.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Runtime Logs</strong></td>
+                            <td><code>~/.hermes/profiles/{profile}/logs/gateway.log</code></td>
+                            <td>Log eksekusi gateway dan perbaikan konteks.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="sub-question">
+                <h3>3.2 Maximum Context Window & Limit Handling Strategy</h3>
+            </div>
+            <div class="comp-card highlight">
+                <h4>Kapasitas Context Window</h4>
+                <p>Kapasitas maksimum mengikuti model LLM dasar yang digunakan oleh profile. Pada profile <code>system-analyst</code> (Model: MiniMax-M2 / Claude Sonnet), kapasitas context window mendukung hingga <strong>128,000 – 200,000 tokens</strong>.</p>
+            </div>
+
+            <p style="margin-top: 16px;"><strong>Strategi Over-Limit Handling:</strong> <code>Partial Summarization & Sliding Window (Smart Context Compressor)</code></p>
+            <p>Ketika akumulasi token pesan mendekati batas maksimum context window model, Hermes mengaktifkan komponen <code>context_compressor</code> (bisa ditrigger otomatis atau via perintah <code>/compress</code>):</p>
+            
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-num">A</div>
+                    <div class="step-content">
+                        <div class="step-title">Split History (Head vs Tail)</div>
+                        <p>Hermes memisah riwayat obrolan menjadi <em>Head</em> (obrolan lama) dan <em>Tail</em> (beberapa pasang turn obrolan terbaru).</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">B</div>
+                    <div class="step-content">
+                        <div class="step-title">Summarize Head</div>
+                        <p>Obrolan lama dipadatkan menjadi ringkasan poin-poin penting (summary topic focus).</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">C</div>
+                    <div class="step-content">
+                        <div class="step-title">Rejoin Head & Tail</div>
+                        <p>Menggabungkan <code>Summary Head</code> + <code>Recent Uncompressed Tail</code> sehingga total prompt token kembali berkurang drastis tanpa kehilangan konteks bisnis utama.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-question">
+                <h3>3.3 Default Retention Period (Durasi Simpan)</h3>
+            </div>
+            <div class="callout">
+                <div class="callout-title">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 8 0 100-16 8 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                    Kebijakan Retention: Indefinite / Persistent
+                </div>
+                <p><strong>Default Retention:</strong> Percakapan pada Hermes Agent tersimpan secara <strong>PERMANEN (Indefinite)</strong> di dalam SQLite database (<code>response_store.db</code> & <code>state.db</code>).</p>
+                <p>Data percakapan tidak akan terhapus otomatis oleh waktu, kecuali jika:</p>
+                <ol style="margin-left: 20px; color: var(--text-muted);">
+                    <li>Dipanggil HTTP API <code>DELETE /api/sessions/{session_id}</code> secara eksplisit oleh client.</li>
+                    <li>Dilakukan pembersihan storage oleh administrator melalui perintah <code>hermes memory prune</code> atau kompresi manual.</li>
+                </ol>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        EKSAD Agentic Knowledge Framework &copy; 2026 — Hermes Gateway Technical Architecture Spec v2.1
+    </footer>
+</div>
+
+</body>
+</html>

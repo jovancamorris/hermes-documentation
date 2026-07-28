@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Lengkap Hermes Agent Gateway: Konsep, Komunikasi & API Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: rgba(21, 29, 46, 0.7);
+            --bg-card-hover: rgba(29, 41, 66, 0.85);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.4);
+            
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(6, 182, 212, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 80px 24px;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+            color: #fff;
+        }
+
+        header {
+            margin-bottom: 48px;
+        }
+
+        .badge-system {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .badge-system::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-emerald);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            word-break: break-word;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 850px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        /* TOC Navigation */
+        .toc-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 48px;
+        }
+
+        .toc-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .toc-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            list-style: none;
+        }
+
+        .toc-links a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .toc-links a:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+        }
+
+        .toc-num {
+            font-weight: 700;
+            color: var(--primary-light);
+            font-family: var(--font-code);
+        }
+
+        /* Main Sections */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 36px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .section-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-weight: 800;
+            font-size: 1.3rem;
+            font-family: var(--font-code);
+            box-shadow: 0 0 15px var(--primary-glow);
+            flex-shrink: 0;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            word-break: break-word;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            font-size: 1rem;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+
+        /* Feature Cards & Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .feature-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .feature-card h4 {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            word-break: break-word;
+        }
+
+        .feature-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-card p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        /* Flow Diagrams & Steps */
+        .flow-diagram {
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 28px;
+            margin: 24px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 42px;
+            bottom: -20px;
+            width: 2px;
+            background: var(--border-card);
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: var(--font-code);
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            padding-top: 4px;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .step-title {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94rem;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(30, 41, 59, 0.8);
+            color: #fff;
+            font-weight: 700;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-card);
+            color: var(--text-muted);
+            word-break: break-word;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+        }
+
+        .method-badge {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: var(--font-code);
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .method-get { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.4); }
+        .method-post { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .method-delete { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.4); }
+
+        .endpoint-path {
+            font-family: var(--font-code);
+            color: #fff;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Code Blocks & Examples */
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0d1322;
+            padding: 10px 16px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: none;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 20px;
+        }
+
+        .code-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        pre {
+            background: #060911;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            padding: 18px;
+            width: 100%;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: visible;
+        }
+
+        code {
+            font-family: var(--font-code);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--accent-cyan);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .callout {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .callout-title {
+            color: var(--primary-light);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-card);
+            padding-top: 32px;
+        }
+
+        /* ===== RESPONSIVE BREAKPOINTS ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px 60px 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .section-card {
+                padding: 24px 16px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toc-links {
+                grid-template-columns: 1fr;
+            }
+
+            pre {
+                font-size: 0.78rem;
+                padding: 14px;
+            }
+
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .code-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            table {
+                font-size: 0.82rem;
+            }
+
+            th, td {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .section-card {
+                padding: 20px 14px;
+                border-radius: 14px;
+            }
+
+            pre {
+                font-size: 0.75rem;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Nav -->
+    <nav class="top-nav">
+        <a href="../index.html" class="back-link">
+            ← Kembali ke Home Page Portal
+        </a>
+        <div style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-dim);">
+            EKSAD Hermes Agent Overview v2.1
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="badge-system">OFFICIAL HERMES AGENTIC ARCHITECTURE GUIDE</div>
+        <h1>Panduan Lengkap Hermes Agent Gateway</h1>
+        <p class="subtitle">Dokumentasi komprehensif mengenai konsep dasar Hermes Agent Gateway, mekanisme komunikasi (Stateless vs Stateful), daftar endpoint REST API resmi, beserta contoh lengkap request payload & response JSON.</p>
+    </header>
+
+    <!-- Table of Contents -->
+    <nav class="toc-box">
+        <div class="toc-title">Daftar Isi Dokumentasi</div>
+        <ul class="toc-links">
+            <li><a href="#section-1"><span class="toc-num">01.</span> Apa itu Hermes Agent Gateway</a></li>
+            <li><a href="#section-2"><span class="toc-num">02.</span> Mekanisme Cara Komunikasi</a></li>
+            <li><a href="#section-3"><span class="toc-num">03.</span> Katalog Endpoint REST API</a></li>
+            <li><a href="#section-4"><span class="toc-num">04.</span> Contoh Payload Request & Response</a></li>
+        </ul>
+    </nav>
+
+    <div class="grid">
+        
+        <!-- SECTION 1: APA ITU HERMES AGENT GATEWAY -->
+        <section id="section-1" class="section-card">
+            <div class="section-header">
+                <div class="icon-box">01</div>
+                <h2>Apa itu Hermes Agent Gateway?</h2>
+            </div>
+
+            <p><strong>Hermes Agent Gateway</strong> adalah platform <em>middleware agentic AI enterprise</em> yang dikembangkan untuk menghubungkan sistem internal PT EKSAD (aplikasi web, backend service, atau alat pengembang) dengan Large Language Models (LLM) tingkat tinggi seperti MiniMax-M2, Claude Sonnet 4, dan GPT-4o.</p>
+
+            <p>Berbeda dengan panggilan API LLM konvensional yang hanya melakukan tanya-jawab teks biasa, Hermes Gateway berfungsi sebagai <strong>Agen Cerdas Berbasis Profile (Profile-Driven Agent)</strong> yang dibekali konteks arsitektur, instruksi sistem (<em>SOUL.md</em>), serta sekumpulan <em>skill/tools</em> otomatis.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4><span class="feature-icon">🧩</span> Multi-Profile Architecture</h4>
+                    <p>Mendukung pemisahan tugas agen secara terisolasi pada port terpisah. Contoh: Profile <code>system-analyst</code> berjalan di port <code>8643</code> khusus membuat TSD & DDL, sedangkan profile <code>business-analyst</code> berjalan di port <code>8642</code> untuk BRD/FSD.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4><span class="feature-icon">🛠️</span> Native Skills & Tools Integration</h4>
+                    <p>Agen mampu menjalankan perkakas teknis seperti <code>eksad-tsd-design</code>, <code>eksad-adr-workflow</code>, dan <code>eksad-appsec-review</code> untuk menghasilkan dokumen teknis standar enterprise secara konsisten.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4><span class="feature-icon">💾</span> Persistent Session Management</h4>
+                    <p>Menyediakan database SQLite internal di level profile untuk mencatat dan mengingat seluruh riwayat obrolan (Chat History) per sesi/tiket secara permanen.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4><span class="feature-icon">⚡</span> Smart Context Compressor</h4>
+                    <p>Secara otomatis memadatkan obrolan lama (*summarization & sliding window*) jika jumlah token percakapan mendekati batas maksimum <em>context window</em> LLM.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: GIMANA CARA KOMUNIKASINYA -->
+        <section id="section-2" class="section-card">
+            <div class="section-header">
+                <div class="icon-box">02</div>
+                <h2>Gimana Cara Komunikasinya?</h2>
+            </div>
+
+            <p>Komunikasi dengan Hermes Agent Gateway dilakukan menggunakan protokol <strong>HTTP/HTTPS REST API</strong> dengan format pertukaran data <strong>JSON Payload</strong>. Akses diamankan menggunakan <strong>Bearer Token Authentication</strong> (<code>API_SERVER_KEY</code>).</p>
+
+            <div class="callout">
+                <div class="callout-title">
+                    🔒 Header Autentikasi Wajib:
+                </div>
+                <pre style="margin: 8px 0 0 0; border: none; border-radius: 6px;"><code>Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9</code></pre>
+            </div>
+
+            <h3 style="color: var(--primary-light); margin: 24px 0 16px 0;">Dua Moda Komunikasi Utama:</h3>
+
+            <div class="feature-grid">
+                <div class="feature-card" style="border-left: 4px solid var(--accent-cyan);">
+                    <h4>1. Moda Stateless (OpenAI Compatible Protocol `/v1`)</h4>
+                    <p>Client mengirimkan array <code>messages</code> lengkap dari awal hingga akhir pada setiap request. Gateway tidak menyimpan riwayat obrolan ke database sesi. Moda ini sangat cocok untuk integrasi aplikasi yang sudah mengelola history sendiri di sistem internal.</p>
+                </div>
+
+                <div class="feature-card" style="border-left: 4px solid var(--primary);">
+                    <h4>2. Moda Stateful (Native Hermes Sessions `/api/sessions`)</h4>
+                    <p>Client menginisialisasi sesi terlebih dahulu untuk mendapatkan <code>session_id</code>. Obrolan berikutnya cukup mengirimkan pesan baru, dan Hermes secara otomatis memuat history terdahulu dari database SQLite, memprosesnya, dan menyimpan respon terbaru ke sesi yang sama.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary-light); margin: 32px 0 16px 0;">Alur Eksekusi Internal Gateway (Lifecycle):</h3>
+            
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Inbound Request & Authentication</div>
+                        <p>Gateway menerima HTTP Request pada port profile (misal <code>8643</code>), memvalidasi Bearer Token <code>API_SERVER_KEY</code>.</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Session Context Binding</div>
+                        <p>Jika memanggil `/api/sessions`, gateway memanggil <code>_bind_api_server_session()</code> untuk memuat riwayat obrolan & variabel <code>user_context</code> dari SQLite DB (<code>response_store.db</code>).</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Agent Execution & Tool Invocation</div>
+                        <p>Agen menjalankan instruksi sistem (*SOUL.md*), memanggil tool jika diperlukan (misal generator TSD/DDL), dan mengirim prompt ke LLM underlying.</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Context Compression & Persistence</div>
+                        <p>Jika token mendekati limit, <code>context_compressor</code> memadatkan obrolan lama. Respon akhir dan token accounting (`input_tokens`, `output_tokens`) disimpan kembali ke SQLite DB.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: APA SAJA ENDPOINTNYA -->
+        <section id="section-3" class="section-card">
+            <div class="section-header">
+                <div class="icon-box">03</div>
+                <h2>Apa Saja Endpointnya?</h2>
+            </div>
+
+            <p>Berikut adalah katalog lengkap endpoint HTTP REST API yang disediakan oleh Hermes Agent Gateway:</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint Path</th>
+                            <th>Protokol</th>
+                            <th>Deskripsi Fungsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method-badge method-get">GET</span></td>
+                            <td><span class="endpoint-path">/v1/models</span></td>
+                            <td>OpenAI</td>
+                            <td>Health check & melihat informasi model aktif pada profile server.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-post">POST</span></td>
+                            <td><span class="endpoint-path">/v1/chat/completions</span></td>
+                            <td>OpenAI</td>
+                            <td>Kirim pesan obrolan dalam format stateless standar OpenAI.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-get">GET</span></td>
+                            <td><span class="endpoint-path">/api/sessions</span></td>
+                            <td>Native</td>
+                            <td>Melihat daftar seluruh sesi obrolan yang tersimpan di server.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-post">POST</span></td>
+                            <td><span class="endpoint-path">/api/sessions</span></td>
+                            <td>Native</td>
+                            <td>Membuat sesi percakapan baru (mengembalikan `session_id`).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-post">POST</span></td>
+                            <td><span class="endpoint-path">/api/sessions/{session_id}/chat</span></td>
+                            <td>Native</td>
+                            <td>Kirim obrolan lanjutan ke sesi tertentu (disimpan otomatis).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-get">GET</span></td>
+                            <td><span class="endpoint-path">/api/sessions/{session_id}/messages</span></td>
+                            <td>Native</td>
+                            <td>Tarik seluruh riwayat percakapan (Chat History) dari sesi.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="method-badge method-delete">DELETE</span></td>
+                            <td><span class="endpoint-path">/api/sessions/{session_id}</span></td>
+                            <td>Native</td>
+                            <td>Hapus sesi obrolan tertentu dari database server.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 4: EXAMPLE PAYLOAD REQUEST DAN RESPONSE -->
+        <section id="section-4" class="section-card">
+            <div class="section-header">
+                <div class="icon-box">04</div>
+                <h2>Contoh Payload Request & Response</h2>
+            </div>
+
+            <p>Berikut adalah contoh lengkap request dan response JSON nyata yang siap diuji menggunakan <code>curl</code>, Postman, atau HTTP Client aplikasi Anda:</p>
+
+            <!-- Example 1 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">1. Health Check & Models List (GET /v1/models)</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Port 8643</span>
+                </div>
+                <pre><code>curl -X GET http://203.145.34.37:8643/v1/models \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 200 OK)</span>
+                </div>
+                <pre><code>{
+  "object": "list",
+  "data": [
+    {
+      "id": "system-analyst",
+      "object": "model",
+      "created": 1785168000,
+      "owned_by": "eksad-hermes"
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <!-- Example 2 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">2. Chat Completion Stateless (POST /v1/chat/completions)</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Stateless Mode</span>
+                </div>
+                <pre><code>curl -X POST http://203.145.34.37:8643/v1/chat/completions \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "system-analyst",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Halo, sebutkan 2 tugas utama System Analyst di EKSAD!"
+      }
+    ]
+  }'</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 200 OK)</span>
+                </div>
+                <pre><code>{
+  "id": "chatcmpl-ba343ecc800a4efa9c86efccdd3b1",
+  "object": "chat.completion",
+  "created": 1785168782,
+  "model": "system-analyst",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Halo! Dua tugas utama System Analyst di EKSAD adalah:\n1. Menulis TSD (Technical Specification Document) sesuai standar arsitektur EKSAD.\n2. Merancang Data Model, Flyway DDL, dan API Contract untuk tim developer."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 16650,
+    "completion_tokens": 85,
+    "total_tokens": 16735
+  }
+}</code></pre>
+            </div>
+
+            <!-- Example 3 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">3. Membuat Sesi Baru (POST /api/sessions)</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Native Session Init</span>
+                </div>
+                <pre><code>curl -X POST http://203.145.34.37:8643/api/sessions \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Session Jovan - Tiket SA-9021"
+  }'</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 201 Created)</span>
+                </div>
+                <pre><code>{
+  "session_id": "api_1785212211_12b5637c",
+  "title": "Session Jovan - Tiket SA-9021",
+  "created_at": 1785212211
+}</code></pre>
+            </div>
+
+            <!-- Example 4 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">4. Kirim Obrolan ke Sesi (POST /api/sessions/{session_id}/chat)</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Stateful Chat</span>
+                </div>
+                <pre><code>curl -X POST http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Tolong buatkan outline TSD singkat untuk microservice svc-user-management"
+  }'</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 200 OK)</span>
+                </div>
+                <pre><code>{
+  "result": {
+    "role": "assistant",
+    "content": "Berikut adalah outline TSD singkat untuk svc-user-management:\n\n1. System Architecture & Boundaries\n2. Data Model & Flyway DDL\n3. API Catalog (/api/v1/users)\n4. RabbitMQ Event Schemas (user.created.event)",
+    "session_id": "api_1785212211_12b5637c"
+  },
+  "usage": {
+    "input_tokens": 16820,
+    "output_tokens": 140,
+    "total_tokens": 16960,
+    "runtime": 2.15
+  }
+}</code></pre>
+            </div>
+
+            <!-- Example 5 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">5. Ambil Riwayat Chat (GET /api/sessions/{session_id}/messages)</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Get Chat History</span>
+                </div>
+                <pre><code>curl -X GET http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 200 OK)</span>
+                </div>
+                <pre><code>{
+  "object": "list",
+  "session_id": "api_1785212211_12b5637c",
+  "data": [
+    {
+      "id": 1,
+      "role": "user",
+      "content": "Tolong buatkan outline TSD singkat untuk microservice svc-user-management",
+      "timestamp": 1785212211.968
+    },
+    {
+      "id": 2,
+      "role": "assistant",
+      "content": "Berikut adalah outline TSD singkat untuk svc-user-management:\n\n1. System Architecture...",
+      "timestamp": 1785212214.120
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <!-- Example 6 -->
+            <div style="margin-top: 32px;">
+                <h3 style="color: var(--accent-cyan);">6. Menghapus Sesi (DELETE /api/sessions/{session_id})</h3>
+                <div class="code-header">
+                    <span class="code-title">HTTP Request (cURL)</span>
+                    <span>Delete Session</span>
+                </div>
+                <pre><code>curl -X DELETE http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+
+                <div class="code-header">
+                    <span class="code-title">JSON Response (HTTP 200 OK)</span>
+                </div>
+                <pre><code>{
+  "status": "success",
+  "message": "Session api_1785212211_12b5637c deleted successfully."
+}</code></pre>
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        PT EKSAD (Eksad Group) &copy; 2026 — Hermes Agent Gateway Comprehensive Technical Manual
+    </footer>
+</div>
+
+</body>
+</html>

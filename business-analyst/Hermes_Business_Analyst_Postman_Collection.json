@@ -1,0 +1,155 @@
+{
+  "info": {
+    "_postman_id": "ba-hermes-collection-v21",
+    "name": "Hermes Agent - Business Analyst API (Port 8642)",
+    "description": "Postman Collection resmi untuk EKSAD Hermes Business Analyst Gateway (Port 8642) mendukung OpenAI API (/v1) dan Native Hermes Sessions API (/api/sessions) untuk persistent chat history.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://203.145.34.37:8642",
+      "type": "string",
+      "description": "Base URL API Server Hermes Business Analyst (Port 8642)"
+    },
+    {
+      "key": "apiKey",
+      "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9",
+      "type": "string",
+      "description": "API_SERVER_KEY (Bearer Token)"
+    },
+    {
+      "key": "session_id",
+      "value": "api_ba_session_demo",
+      "type": "string",
+      "description": "Session ID unik untuk chat history"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{apiKey}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "OpenAI Compatible Endpoints (/v1)",
+      "item": [
+        {
+          "name": "1. Health Check - List Models",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/models",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "models"]
+            },
+            "description": "Cek status kesehatan server dan daftar model aktif untuk profile Business Analyst."
+          }
+        },
+        {
+          "name": "2. Chat Completion (Stateless)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"business-analyst\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Halo, sebutkan 3 peran utama Business Analyst di EKSAD dalam menyusun FSD!\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            },
+            "description": "Mengirimkan pesan obrolan sekali respon (stateless) tanpa menyimpan riwayat di database server."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Native Hermes Sessions API (/api/sessions)",
+      "item": [
+        {
+          "name": "1. Create New Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Session BA - Procurement Workflow BRD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions"]
+            },
+            "description": "Membuat sesi percakapan baru di database server. Mengembalikan session_id unik."
+          }
+        },
+        {
+          "name": "2. Send Chat to Session (Stateful)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan User Story dan Acceptance Criteria untuk modul Approval Matrix pada E-Procurement.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Mengirim obrolan lanjutan ke sesi tertentu. Percakapan tersimpan otomatis di database server."
+          }
+        },
+        {
+          "name": "3. Get Session Messages History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "messages"]
+            },
+            "description": "Mengambil seluruh daftar riwayat obrolan (Chat History) yang tersimpan pada session_id bersangkutan."
+          }
+        },
+        {
+          "name": "4. Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}"]
+            },
+            "description": "Menghapus sesi tertentu dari database server."
+          }
+        }
+      ]
+    }
+  ]
+}

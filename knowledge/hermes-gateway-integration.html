@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spesifikasi Arsitektur & Integrasi Teknis: Hermes Agentic Gateway</title>
-    <meta name="description" content="Dokumentasi presisi arsitektur internal Hermes Agentic Gateway: Session Management, Token Accounting, Memory Compression, dan Storage Internals.">
+    <title>Spesifikasi Arsitektur &amp; Integrasi Teknis: Hermes Agent Gateway</title>
+    <meta name="description" content="Panduan Komprehensif Hermes Agentic Gateway untuk Audience Umum, Leader, dan Developer: Session Management, Token Accounting, Server Restart Storage Retention, dan API Contracts.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         :root {
             --bg:#070b14; --card:rgba(15,23,42,.75); --code:#060a12;
@@ -25,7 +26,7 @@
             background-image:radial-gradient(ellipse at 10% 5%,rgba(99,102,241,.14) 0%,transparent 50%),
             radial-gradient(ellipse at 90% 80%,rgba(6,182,212,.08) 0%,transparent 45%);
             background-attachment:fixed}
-        .toc{position:fixed;top:0;left:0;width:260px;height:100vh;overflow-y:auto;
+        .toc{position:fixed;top:0;left:0;width:270px;height:100vh;overflow-y:auto;
             background:rgba(7,11,20,.96);backdrop-filter:blur(20px);
             border-right:1px solid var(--bc);padding:28px 20px;z-index:100;
             display:flex;flex-direction:column;gap:4px}
@@ -41,8 +42,8 @@
             text-decoration:none;font-size:.8rem;transition:all .2s}
         .ta:hover{background:var(--pd);color:var(--pl)}
         .ta.active{background:var(--pd);color:var(--pl);border-left:2px solid var(--pr)}
-        .main{margin-left:260px;padding:48px 52px 100px;max-width:1100px}
-        .phdr{margin-bottom:60px;padding-bottom:32px;border-bottom:1px solid var(--bc)}
+        .main{margin-left:270px;padding:48px 52px 100px;max-width:1150px}
+        .phdr{margin-bottom:48px;padding-bottom:28px;border-bottom:1px solid var(--bc)}
         .br2{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
         .bdg{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:.74rem;font-weight:600}
         .bp{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);color:var(--pl)}
@@ -52,7 +53,7 @@
         h1{font-size:2.5rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;
             background:linear-gradient(135deg,#fff,#94a3b8);
             -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
-        .ps{font-size:1rem;color:var(--mu);max-width:700px;line-height:1.8}
+        .ps{font-size:1.05rem;color:var(--mu);max-width:800px;line-height:1.8}
         .mb{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px}
         .mi{font-size:.8rem;color:var(--di);display:flex;align-items:center;gap:6px}
         .mi strong{color:var(--mu)}
@@ -64,22 +65,23 @@
             padding-bottom:24px;border-bottom:1px solid var(--bc)}
         .ib{width:48px;height:48px;border-radius:12px;background:var(--pd);
             border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;
-            justify-content:center;color:var(--pl);font-weight:800;font-size:1rem;flex-shrink:0}
+            justify-content:center;color:var(--pl);font-weight:800;font-size:1.2rem;flex-shrink:0}
         .ib.em{background:var(--ed);border-color:rgba(16,185,129,.3);color:var(--em)}
         .ib.cy{background:var(--cd);border-color:rgba(6,182,212,.3);color:var(--cy)}
         .ib.am{background:var(--ad);border-color:rgba(245,158,11,.3);color:var(--am)}
+        .ib.vi{background:var(--vd);border-color:rgba(168,85,247,.3);color:var(--vi)}
         .stg h2{font-size:1.5rem;font-weight:700;color:var(--br);margin-bottom:5px;letter-spacing:-.02em}
         .stg p{font-size:.86rem;color:var(--di);margin:0}
         .ss{margin-top:36px} .ss+.ss{padding-top:32px;border-top:1px solid var(--bs)}
         .ssh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
         .sn{font-size:.7rem;font-weight:700;font-family:var(--fc);color:var(--pr);
             background:var(--pd);border:1px solid rgba(99,102,241,.2);padding:3px 8px;border-radius:6px}
-        h3{font-size:1.1rem;font-weight:600;color:var(--tm);letter-spacing:-.01em}
-        h4{font-size:.94rem;font-weight:600;color:var(--tm);margin-bottom:10px}
+        h3{font-size:1.15rem;font-weight:600;color:var(--tm);letter-spacing:-.01em}
+        h4{font-size:.95rem;font-weight:600;color:var(--tm);margin-bottom:10px}
         p{color:var(--mu);margin-bottom:14px;font-size:.94rem;line-height:1.8}
         p:last-child{margin-bottom:0}
         ul,ol{color:var(--mu);font-size:.94rem;padding-left:22px;margin-bottom:14px;line-height:1.8}
-        li{margin-bottom:5px} li strong{color:var(--tm)}
+        li{margin-bottom:6px} li strong{color:var(--tm)}
         pre{background:var(--code);border:1px solid rgba(255,255,255,.07);border-radius:12px;
             padding:20px;font-family:var(--fc);font-size:.82rem;color:#e2e8f0;
             margin:18px 0;line-height:1.7;position:relative;
@@ -95,15 +97,6 @@
         code{font-family:var(--fc);background:rgba(255,255,255,.07);padding:2px 7px;
             border-radius:5px;font-size:.83em;color:var(--cy);white-space:pre-wrap;word-break:break-all}
         pre code{background:none;padding:0;color:inherit;font-size:inherit;white-space:pre-wrap;word-break:break-all}
-        .kw{color:#818cf8} .str{color:#6ee7b7} .num{color:#fbbf24} .cmt{color:#4b5563;font-style:italic}
-        .fn{color:#c4b5fd}
-        .tw{overflow-x:auto;margin:20px 0;border-radius:12px;border:1px solid var(--bc)}
-        table{width:100%;border-collapse:collapse;font-size:.87rem}
-        th{background:rgba(15,23,42,.9);color:var(--tm);font-weight:600;padding:13px 18px;
-            border-bottom:1px solid var(--bc);text-align:left;white-space:nowrap}
-        td{padding:12px 18px;border-bottom:1px solid var(--bs);color:var(--mu);
-            vertical-align:top;line-height:1.6}
-        tr:last-child td{border-bottom:none} tr:hover td{background:rgba(255,255,255,.015)}
         .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0}
         .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:20px 0}
         .ic{background:rgba(10,15,28,.7);border:1px solid var(--bc);border-radius:12px;padding:22px}
@@ -132,637 +125,563 @@
         .evid{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25)} .evid .cl{color:var(--em)}
         .crit{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.25)} .crit .cl{color:var(--ro)}
         .flow{background:rgba(7,11,20,.8);border:1px solid var(--bc);border-radius:12px;padding:28px 24px;margin:20px 0}
-        .fst{display:flex;align-items:flex-start;gap:18px;margin-bottom:20px;position:relative}
-        .fst:not(:last-child)::after{content:'';position:absolute;left:19px;top:40px;bottom:-20px;
-            width:2px;background:linear-gradient(to bottom,var(--bhl),transparent)}
-        .num2{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
-            justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;font-family:var(--fc)}
-        .num2.pu{background:var(--pd);border:1px solid var(--pr);color:var(--pl)}
-        .num2.em{background:var(--ed);border:1px solid var(--em);color:var(--em)}
-        .num2.cy{background:var(--cd);border:1px solid var(--cy);color:var(--cy)}
-        .num2.am{background:var(--ad);border:1px solid var(--am);color:var(--am)}
-        .sb2{flex:1;padding-top:6px}
-        .st2{color:var(--br);font-weight:600;font-size:.94rem;margin-bottom:6px}
-        .sb2 p{margin-bottom:8px;font-size:.87rem}
-        .tmtr{background:rgba(7,11,20,.9);border:1px solid var(--bc);border-radius:12px;padding:20px;margin:16px 0}
-        .trow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-        .trow:last-child{margin-bottom:0}
-        .tlbl{width:175px;font-size:.8rem;color:var(--mu);font-family:var(--fc);flex-shrink:0}
-        .ttrk{flex:1;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
-        .tfil{height:100%;border-radius:4px}
-        .tval{font-size:.78rem;font-family:var(--fc);color:var(--mu);width:65px;text-align:right}
-        footer{text-align:center;color:var(--di);font-size:.8rem;border-top:1px solid var(--bc);
-            padding-top:28px;margin-top:60px;line-height:2}
-        @media(max-width:900px){.toc{display:none}.main{margin-left:0;padding:28px 20px 80px}h1{font-size:1.8rem}}
+        .tw{overflow-x:auto;margin:20px 0;border-radius:12px;border:1px solid var(--bc)}
+        table{width:100%;border-collapse:collapse;font-size:.87rem}
+        th{background:rgba(15,23,42,.9);color:var(--tm);font-weight:600;padding:13px 18px;
+            border-bottom:1px solid var(--bc);text-align:left;white-space:nowrap}
+        td{padding:12px 18px;border-bottom:1px solid var(--bs);color:var(--mu);
+            vertical-align:top;line-height:1.6}
+        tr:last-child td{border-bottom:none} tr:hover td{background:rgba(255,255,255,.015)}
+
+        .faq-box {
+            background: rgba(10,15,28,0.8);
+            border: 1px solid var(--bc);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 16px 20px;
+            font-weight: 700;
+            color: var(--br);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            transition: background 0.2s;
+        }
+        .faq-question:hover {
+            background: rgba(99,102,241,0.08);
+            color: var(--pl);
+        }
+        .faq-answer {
+            padding: 20px;
+            border-top: 1px solid var(--bc);
+            background: rgba(0,0,0,0.2);
+            font-size: 0.92rem;
+            color: var(--mu);
+        }
     </style>
 </head>
 <body>
-<nav class="toc">
-    <div class="tb">HERMES GATEWAY SPEC</div>
-    <a href="../index.html" class="ta" style="color:var(--em);border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);margin-bottom:10px;font-weight:600">&larr; Home Page Portal</a>
-    <div class="tl">Session Management</div>
-    <a href="#s1" class="ta">01 &mdash; Arsitektur Sesi</a>
-    <a href="#s1-1" class="ta">&#8594; Stateful vs Stateless Theory</a>
-    <a href="#s1-2" class="ta">&#8594; _bind_api_server_session()</a>
-    <a href="#s1-3" class="ta">&#8594; Alur Histori &amp; Chat</a>
-    <a href="#s1-4" class="ta">&#8594; Session Key vs Session ID</a>
-    <div class="tl">Token Accounting</div>
-    <a href="#s2" class="ta">02 &mdash; Token Tracking</a>
-    <a href="#s2-1" class="ta">&#8594; Mekanisme Kalkulasi</a>
-    <a href="#s2-2" class="ta">&#8594; Struktur JSON Usage</a>
-    <a href="#s2-3" class="ta">&#8594; Per-Turn vs Kumulatif</a>
-    <div class="tl">Storage &amp; Memory</div>
-    <a href="#s3" class="ta">03 &mdash; Storage Architecture</a>
-    <a href="#s3-1" class="ta">&#8594; SQLite Schema Internal</a>
-    <a href="#s3-2" class="ta">&#8594; Context Compressor Theory</a>
-    <a href="#s3-3" class="ta">&#8594; Sliding Window Compression</a>
-    <a href="#s3-4" class="ta">&#8594; Retention Policy</a>
-    <div class="tl">Appendix</div>
-    <a href="#s4" class="ta">04 &mdash; Quick Reference</a>
-    <a href="#s5" class="ta">05 &mdash; Source Evidence Map</a>
-</nav>
-<main class="main">
-    <!-- Top Nav Back Button -->
-    <nav style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--bc)">
-        <a href="../index.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--pl);text-decoration:none;font-size:0.9rem;font-weight:600">
-            &larr; Kembali ke Home Page Portal
-        </a>
-        <div style="font-family:var(--fc);font-size:0.82rem;color:var(--di)">
-            EKSAD Hermes Integration Spec v2.3
-        </div>
-    </nav>
 
-    <div class="phdr">
+<!-- TOC Sidebar -->
+<aside class="toc">
+    <a href="../index.html" class="ta" style="color:var(--em);margin-bottom:12px;font-weight:700">&larr; Portal Home Hub</a>
+    <div class="tb">Gateway Integration</div>
+    
+    <div class="tl">🎯 For Audience &amp; Leader</div>
+    <a href="#sec-audience-analogy" class="ta">1. Analogi Konsep Sederhana</a>
+    <a href="#sec-audience-tokens" class="ta">2. Memahami Token Accounting</a>
+    <a href="#sec-audience-storage" class="ta">3. Memory &amp; Storage Retention</a>
+    <a href="#sec-audience-restart" class="ta">4. Efek Server Restart</a>
+    <a href="#sec-audience-faq" class="ta">5. Executive FAQ Briefing</a>
+
+    <div class="tl">🛠️ For Developer</div>
+    <a href="#sec-dev-connection" class="ta">6. Server &amp; Auth Credentials</a>
+    <a href="#sec-dev-endpoints" class="ta">7. API Endpoint Contracts</a>
+    <a href="#sec-dev-postman" class="ta">8. Postman Collection Import</a>
+    <a href="#sec-dev-prompts" class="ta">9. Prompt Templates Siap Pakai</a>
+</aside>
+
+<main class="main">
+
+    <!-- Header -->
+    <header class="phdr">
         <div class="br2">
-            <span class="bdg bp">HERMES GATEWAY</span>
-            <span class="bdg be">SOURCE: api_server.py</span>
-            <span class="bdg ba">BEBAS HALUSINASI</span>
-            <span class="bdg bc2">v2.3 &mdash; 2026</span>
+            <span class="bdg bp">EKSAD Hermes Framework v2.3</span>
+            <span class="bdg be">Gateway Active (203.145.34.37)</span>
+            <span class="bdg bc2">Audience &amp; Developer Friendly</span>
         </div>
-        <h1>Spesifikasi Arsitektur &amp; Integrasi Teknis<br>Hermes Agentic Gateway</h1>
-        <p class="ps">Dokumentasi teknis mendalam mengenai mekanisme internal Hermes Gateway: session binding, token lifecycle, context compression, dan persistent storage. Seluruh klaim dalam dokumen ini dapat ditelusuri langsung ke source code <code>api_server.py</code>, <code>slash_commands.py</code>, dan skema SQLite aktual dari server Hermes.</p>
+        <h1>Spesifikasi Arsitektur &amp; Integrasi Teknis: Hermes Agent Gateway</h1>
+        <p class="ps">
+            Panduan lengkap integrasi <strong>Hermes Agentic Gateway</strong>. Dokumen ini dirancang khusus agar mudah dipahami oleh <strong>Audience Umum / Management / Leader</strong> sekaligus memberikan panduan presisi <strong>API Contract untuk Tim Developer</strong>.
+        </p>
         <div class="mb">
-            <div class="mi">&#128230; <strong>Source:</strong> api_server.py, slash_commands.py</div>
-            <div class="mi">&#128451; <strong>DB:</strong> response_store.db (SQLite3)</div>
-            <div class="mi">&#129504; <strong>Profile:</strong> system-analyst, business-analyst</div>
+            <div class="mi"><span>🌐 Server IP:</span> <strong>203.145.34.37</strong></div>
+            <div class="mi"><span>🔌 SA Port:</span> <strong>8643 (MiniMax-M2)</strong></div>
+            <div class="mi"><span>🔌 BA Port:</span> <strong>8642 (Claude Sonnet 4)</strong></div>
+        </div>
+    </header>
+
+    <!-- SECTION 1: FOR AUDIENCE & LEADER -->
+    <div class="sc" id="sec-audience-analogy">
+        <div class="sh">
+            <div class="ib vi">🎯</div>
+            <div class="stg">
+                <h2>1. Analogi Konsep Sederhana (Audience &amp; Leader)</h2>
+                <p>Memahami perbedaan 2 Mode Integrasi Hermes Gateway dengan analogi dunia nyata.</p>
+            </div>
+        </div>
+
+        <p>
+            Saat aplikasi kita berkomunikasi dengan <strong>Hermes Agent AI</strong>, ada dua cara berinteraksi yang bisa digunakan oleh developer:
+        </p>
+
+        <div class="g2">
+            <div class="ic p">
+                <div class="it"><span class="dot dp"></span> Mode A: Stateful Session (`/api/sessions`)</div>
+                <div class="cl" style="color:var(--pl)">Analogi: Chat WhatsApp</div>
+                <p>
+                    Seperti mengobrol di <strong>WhatsApp</strong>. Server Hermes mengingat seluruh riwayat pesan sebelumnya berdasarkan <code>session_id</code>. Pengguna bisa melanjutkan obrolan tanpa perlu mengulang penjelasan dari awal.
+                </p>
+                <ul>
+                    <li><strong>Keunggulan:</strong> AI otomatis ingat konteks proyek/TSD.</li>
+                    <li><strong>Cocok Untuk:</strong> Aplikasi Web/Mobile Chat Interface interaktif.</li>
+                </ul>
+            </div>
+
+            <div class="ic c">
+                <div class="it"><span class="dot dc"></span> Mode B: Stateless Completion (`/v1/chat/completions`)</div>
+                <div class="cl" style="color:var(--cy)">Analogi: Panggilan Walkie-Talkie / SMS Single</div>
+                <p>
+                    Seperti <strong>SMS sekali kirim</strong> atau <strong>Walkie-Talkie</strong>. Setiap pesan berdiri sendiri. Jika ingin AI mengingat konteks sebelumnya, aplikasi harus mengirimkan ulang seluruh histori percakapan dalam satu paket payload.
+                </p>
+                <ul>
+                    <li><strong>Keunggulan:</strong> Sangat fleksibel untuk otomatisasi backend / script.</li>
+                    <li><strong>Cocok Untuk:</strong> Microservice, CLI tools, &amp; task otomatisasi.</li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- SECTION 1: SESSION MANAGEMENT -->
-    <section class="sc" id="s1">
-        <div class="sh">
-            <div class="ib">01</div>
-            <div class="stg">
-                <h2>Session Management &amp; Chat History</h2>
-                <p>Analisis mendalam mekanisme stateful session binding, pemetaan session_id, dan alur histori percakapan Hermes.</p>
-            </div>
-        </div>
-
-        <div class="ss" id="s1-1">
-            <div class="ssh"><span class="sn">1.1</span><h3>Teori Dasar: Stateful vs Stateless Protocol dalam Konteks LLM Gateway</h3></div>
-            <p>Sebelum memahami implementasi spesifik Hermes, penting untuk memahami landasan teorinya. Dalam arsitektur API modern, terdapat dua paradigma fundamental dalam mengelola state percakapan antar HTTP request:</p>
-            <div class="g2">
-                <div class="ic c">
-                    <div class="it"><span class="dot dc"></span>/v1/chat/completions &mdash; Stateless by Design</div>
-                    <p>Mengikuti spesifikasi OpenAI API. Setiap HTTP request adalah <em>unit mandiri</em>. Server tidak menyimpan konteks percakapan; client bertanggung jawab penuh mengirimkan seluruh histori melalui array <code>messages[]</code> pada setiap request.</p>
-                    <p>Model ini disebut <strong>Request-Response Stateless</strong> &mdash; skalabel secara horizontal namun membebani bandwidth karena history dikirim ulang setiap turn.</p>
-                </div>
-                <div class="ic p">
-                    <div class="it"><span class="dot dp"></span>/api/sessions &mdash; Stateful Native Hermes</div>
-                    <p>Hermes menyimpan konteks percakapan di sisi server (SQLite). Client cukup mengirim pesan baru &mdash; server merekonstruksi histori dari database dan menyuntikkannya ke context window agent sebelum eksekusi.</p>
-                    <p>Model ini dikenal sebagai <strong>Server-Side Session State</strong> &mdash; efisien bandwidth, memungkinkan reuse sesi antar klien, dan menjamin persistensi data.</p>
-                </div>
-            </div>
-            <div class="clo note">
-                <div class="ci">&#8505;&#65039;</div>
-                <div class="cb"><div class="cl">Catatan Arsitektur</div>
-                <p>Hermes mendukung kedua paradigma secara simultan. Endpoint <code>/v1/chat/completions</code> dapat di-upgrade menjadi stateful jika client menyertakan HTTP header <code>X-Hermes-Session-Id</code> atau <code>X-Hermes-Session-Key</code>. Ketika header ini hadir, <code>api_server.py</code> menjalankan binding logic identik dengan endpoint native session.</p></div>
-            </div>
-        </div>
-
-        <div class="ss" id="s1-2">
-            <div class="ssh"><span class="sn">1.2</span><h3>Mekanisme Kritis: Fungsi <code>_bind_api_server_session()</code></h3></div>
-            <p>Inti dari seluruh session management Hermes bertumpu pada fungsi internal di <code>api_server.py</code>: <code>_bind_api_server_session()</code>. Fungsi ini berperan sebagai <em>context injector</em> &mdash; jembatan antara request HTTP yang masuk dengan state agent yang akan dieksekusi.</p>
-            <p><strong>Urutan operasi fungsi ini:</strong></p>
-            <ol>
-                <li><strong>Menerima <code>session_key</code> dan <code>session_id</code></strong> dari incoming request sebagai parameter.</li>
-                <li><strong>Memanggil <code>set_session_vars()</code></strong> pada agent runtime untuk menanamkan kedua identifier ke execution context.</li>
-                <li><strong>Memuat histori pesan</strong> dari <code>response_store.db</code> sesuai <code>session_id</code>, lalu merekonstruksi messages array untuk disuntikkan ke LLM.</li>
-                <li><strong>Menyinkronkan token counter</strong> pada objek <code>agent</code> agar tracking berlanjut kumulatif per sesi.</li>
-            </ol>
-            <pre><span class="lb py">PYTHON &mdash; api_server.py (reconstructed logic)</span>
-<span class="cmt"># Dipanggil sebelum agent.run() di setiap request session</span>
-<span class="kw">def</span> <span class="fn">_bind_api_server_session</span>(agent, session_key: str, session_id: str):
-    <span class="cmt"># 1. Tanamkan identifier ke execution context</span>
-    agent.<span class="fn">set_session_vars</span>(session_key=session_key, session_id=session_id)
-
-    <span class="cmt"># 2. Muat riwayat dari SQLite</span>
-    history = db.<span class="fn">get_messages</span>(session_id=session_id)
-
-    <span class="cmt"># 3. Rekonstruksi messages array untuk context injection</span>
-    agent.conversation_history = [
-        {<span class="str">"role"</span>: msg[<span class="str">"role"</span>], <span class="str">"content"</span>: msg[<span class="str">"content"</span>]}
-        <span class="kw">for</span> msg <span class="kw">in</span> history
-    ]
-    <span class="cmt"># 4. Sinkronkan token counter agar kumulatif</span>
-    agent.session_prompt_tokens = db.<span class="fn">get_session_token_sum</span>(session_id, <span class="str">"prompt"</span>)
-    agent.session_completion_tokens = db.<span class="fn">get_session_token_sum</span>(session_id, <span class="str">"completion"</span>)
-    agent.session_total_tokens = agent.session_prompt_tokens + agent.session_completion_tokens
-    <span class="kw">return</span> agent</pre>
-            <div class="clo ins">
-                <div class="ci">&#128300;</div>
-                <div class="cb"><div class="cl">Insight Desain</div>
-                <p>Pola <code>_bind_api_server_session()</code> secara arsitektur identik dengan pola <strong>Dependency Injection + Context Propagation</strong> yang umum dalam framework Spring (Java) atau FastAPI. Hermes mengadopsi pola ini untuk memastikan setiap agent execution berjalan dengan konteks tepat, terlepas dari endpoint yang digunakan.</p></div>
-            </div>
-        </div>
-
-        <div class="ss" id="s1-3">
-            <div class="ssh"><span class="sn">1.3</span><h3>Alur Lengkap: Mengambil Histori &amp; Menyambung Percakapan</h3></div>
-            <p>Berikut alur end-to-end yang presisi untuk inisialisasi sesi, percakapan lanjutan, dan pengambilan histori:</p>
-            <div class="flow">
-                <div class="fst">
-                    <div class="num2 em">1</div>
-                    <div class="sb2">
-                        <div class="st2">Inisialisasi Sesi Baru &mdash; POST /api/sessions</div>
-                        <p>Server menghasilkan <code>session_id</code> format <code>api_{unix_timestamp}_{8char_hash}</code> dan menyimpan metadata ke tabel <code>conversations</code> di SQLite.</p>
-                        <pre><span class="lb http">REQUEST</span>
-POST /api/sessions
-Authorization: Bearer &lt;API_SERVER_KEY&gt;
-Content-Type: application/json
-{ "title": "Session SA Modernization &mdash; Jovan" }
-
-<span class="cmt">RESPONSE:</span>
-{ "session_id": "api_1785212211_12b5637c", "profile": "system-analyst", "created_at": 1785212211.0 }</pre>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 pu">2</div>
-                    <div class="sb2">
-                        <div class="st2">Kirim Pesan &amp; Dapatkan Respons &mdash; POST /api/sessions/{id}/chat</div>
-                        <p>Server: (a) memanggil <code>_bind_api_server_session()</code>, (b) memuat histori dari DB, (c) menjalankan agent, (d) menyimpan pasangan user-assistant ke DB, (e) mengembalikan respons + usage token.</p>
-                        <pre><span class="lb http">REQUEST</span>
-POST /api/sessions/api_1785212211_12b5637c/chat
-{ "message": "Tolong buatkan ERD untuk modul User Account" }
-
-<span class="lb json">RESPONSE</span>
-{ "result": { "role": "assistant", "content": "Berikut ERD...", "session_id": "api_1785212211_12b5637c" },
-  "usage": { "input_tokens": 2350, "output_tokens": 480, "total_tokens": 2830, "runtime": 2.1 } }</pre>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 cy">3</div>
-                    <div class="sb2">
-                        <div class="st2">Sambung Percakapan (Turn Ke-N) &mdash; Endpoint sama, hanya pesan baru</div>
-                        <p>Server secara otomatis memuat seluruh histori sebelumnya dari DB. Client <strong>tidak perlu</strong> mengirim ulang histori &mdash; cukup pesan baru saja. Ini adalah keuntungan utama stateful session Hermes.</p>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 am">4</div>
-                    <div class="sb2">
-                        <div class="st2">Ambil Seluruh Histori &mdash; GET /api/sessions/{id}/messages</div>
-                        <p>Endpoint read-only. Query tabel <code>responses</code> di <code>response_store.db</code>, diurutkan <code>timestamp ASC</code>.</p>
-                        <pre><span class="lb json">RESPONSE</span>
-{
-  "object": "list",
-  "session_id": "api_1785212211_12b5637c",
-  "profile": "system-analyst",
-  "total_messages": 10,
-  "data": [
-    { "id": 55, "role": "user", "content": "Tolong buatkan ERD...", "timestamp": 1785212211.968 },
-    { "id": 56, "role": "assistant", "content": "Berikut ERD...", "timestamp": 1785212214.12, "token_count": 480 }
-  ]
-}</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ss" id="s1-4">
-            <div class="ssh"><span class="sn">1.4</span><h3>Pembedaan Kritis: <code>gateway_session_key</code> vs <code>session_id</code></h3></div>
-            <p>Ini adalah sumber kebingungan paling umum dalam integrasi Hermes. Keduanya adalah identifier, tetapi beroperasi di lapisan yang berbeda:</p>
-            <div class="tw">
-                <table>
-                    <thead><tr><th>Properti</th><th><code>gateway_session_key</code></th><th><code>session_id</code></th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>Lapisan</strong></td><td>Infrastructure / Runtime</td><td>Application / Business Logic</td></tr>
-                        <tr><td><strong>Format</strong></td><td>UUID v4 atau hash internal</td><td><code>api_{timestamp}_{8char_hash}</code></td></tr>
-                        <tr><td><strong>Fungsi</strong></td><td>Identifikasi instance agent di memory; routing request ke process yang tepat.</td><td>Identifikasi thread percakapan di storage layer; query SQLite dan pengelolaan riwayat.</td></tr>
-                        <tr><td><strong>Visibility</strong></td><td>Internal (header <code>X-Hermes-Session-Key</code>), tidak diekspos ke end-client</td><td>Publik &mdash; dikembalikan dalam response body, digunakan sebagai path parameter URL</td></tr>
-                        <tr><td><strong>Lifetime</strong></td><td>Ephemeral: habis saat agent process di-restart atau idle timeout tercapai</td><td>Persistent: tersimpan di SQLite hingga dihapus eksplisit</td></tr>
-                        <tr><td><strong>Relasi</strong></td><td colspan="2">One-to-One pada satu waktu: satu <code>session_id</code> dapat di-bind ke <code>gateway_session_key</code> berbeda setelah server restart.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="clo warn">
-                <div class="ci">&#9888;&#65039;</div>
-                <div class="cb"><div class="cl">Peringatan Integrasi</div>
-                <p>Jangan menyimpan <code>gateway_session_key</code> sebagai persistent identifier di sisi client. Key ini bersifat ephemeral dan dapat berubah tanpa pemberitahuan ketika server di-restart. Gunakan <code>session_id</code> sebagai satu-satunya identifier yang aman untuk disimpan jangka panjang.</p></div>
-            </div>
-        </div>
-    </section>
-
     <!-- SECTION 2: TOKEN ACCOUNTING -->
-    <section class="sc" id="s2">
+    <div class="sc" id="sec-audience-tokens">
         <div class="sh">
-            <div class="ib cy">02</div>
+            <div class="ib am">📊</div>
             <div class="stg">
-                <h2>Token Accounting &amp; Tracking</h2>
-                <p>Mekanisme kalkulasi, akumulasi, dan pelaporan token usage dalam Hermes Gateway runtime.</p>
+                <h2>2. Memahami Token Accounting (Perhitungan Pemakaian AI)</h2>
+                <p>Bagaimana kuota dan biaya pemakaian AI dihitung per percakapan.</p>
             </div>
         </div>
 
-        <div class="ss" id="s2-1">
-            <div class="ssh"><span class="sn">2.1</span><h3>Mekanisme Otomatis Kalkulasi &amp; Akumulasi Token</h3></div>
-            <p><strong style="color:var(--em)">Ya, Hermes secara otomatis menghitung, mengakumulasi, dan melacak token usage.</strong> Tidak diperlukan konfigurasi tambahan dari sisi client. Implementasi beroperasi di dua lapisan:</p>
-            <div class="g2">
-                <div class="ic e">
-                    <div class="it"><span class="dot de"></span>Lapisan 1: Provider LLM Response</div>
-                    <p>Setiap response dari provider LLM (Anthropic Claude, MiniMax-M2, Google) menyertakan objek <code>usage</code> dengan token count aktual. <code>api_server.py</code> mengekstrak nilai ini setiap kali response diterima dari provider.</p>
-                </div>
-                <div class="ic p">
-                    <div class="it"><span class="dot dp"></span>Lapisan 2: Agent Object Accumulation</div>
-                    <p>Nilai per-turn dikumulasikan ke tiga atribut objek <code>agent</code>: <code>session_prompt_tokens</code>, <code>session_completion_tokens</code>, dan <code>session_total_tokens</code>. Ini adalah running sum sepanjang lifetime sesi.</p>
-                </div>
-            </div>
-            <pre><span class="lb py">PYTHON &mdash; Token accumulation pattern (api_server.py)</span>
-<span class="cmt"># Setelah setiap LLM response diterima:</span>
-turn_prompt = llm_response.usage.prompt_tokens
-turn_completion = llm_response.usage.completion_tokens
+        <p>
+            Setiap interaksi dengan LLM/AI menggunakan satuan ukur yang disebut <strong>Token</strong> (1 token &approx; 4 karakter teks Indonesia/Inggris). Pemakaian token dibagi menjadi 3 komponen utama:
+        </p>
 
-<span class="cmt"># Akumulasi ke atribut agent (running total sepanjang sesi)</span>
-agent.session_prompt_tokens += turn_prompt
-agent.session_completion_tokens += turn_completion
-agent.session_total_tokens = agent.session_prompt_tokens + agent.session_completion_tokens
-
-<span class="cmt"># Simpan per-turn ke SQLite untuk audit trail</span>
-db.<span class="fn">save_response</span>(
-    session_id=session_id, role=<span class="str">"assistant"</span>, content=response_content,
-    prompt_tokens=turn_prompt, completion_tokens=turn_completion
-)</pre>
-            <div class="clo evid">
-                <div class="ci">&#9989;</div>
-                <div class="cb"><div class="cl">Bukti Kode</div>
-                <p>Atribut <code>agent.session_prompt_tokens</code>, <code>agent.session_completion_tokens</code>, dan <code>agent.session_total_tokens</code> dikonfirmasi dari inspeksi langsung object agent di session aktif, menghasilkan nilai integer yang mengakumulasi bertahap setiap turn percakapan.</p></div>
+        <div class="g3">
+            <div class="ic p">
+                <div class="it"><span class="dot dp"></span> Prompt Tokens</div>
+                <p>Jumlah token masukan yang dikirim oleh pengguna (pertanyaan + instruksi sistem + histori pesan).</p>
             </div>
-            <p>Distribusi token nyata dari sesi yang diinspeksi (<code>api_1785212211_12b5637c</code>):</p>
-            <div class="tmtr">
-                <div class="trow">
-                    <div class="tlbl">prompt_tokens</div>
-                    <div class="ttrk"><div class="tfil" style="width:98%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div>
-                    <div class="tval">16,650</div>
-                </div>
-                <div class="trow">
-                    <div class="tlbl">completion_tokens</div>
-                    <div class="ttrk"><div class="tfil" style="width:2%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
-                    <div class="tval">315</div>
-                </div>
-                <div class="trow">
-                    <div class="tlbl">total_tokens</div>
-                    <div class="ttrk"><div class="tfil" style="width:100%;background:linear-gradient(90deg,#06b6d4,#67e8f9)"></div></div>
-                    <div class="tval">16,965</div>
-                </div>
+            <div class="ic e">
+                <div class="it"><span class="dot de"></span> Completion Tokens</div>
+                <p>Jumlah token luaran yang dihasilkan oleh jawaban AI Agent.</p>
             </div>
-            <p style="font-size:.78rem;text-align:center;color:var(--di)">Prompt tokens mendominasi karena mencakup system prompt + seluruh histori percakapan sebelumnya yang dimuat dari SQLite.</p>
-        </div>
-
-        <div class="ss" id="s2-2">
-            <div class="ssh"><span class="sn">2.2</span><h3>Struktur JSON Response <code>usage</code> per Endpoint</h3></div>
-            <p>Format field <code>usage</code> berbeda tergantung endpoint yang digunakan. Perbedaan ini penting saat membangun parser di sisi client:</p>
-            <div class="g2">
-                <div>
-                    <h4 style="color:var(--cy);margin-bottom:10px">Endpoint: <code>/v1/chat/completions</code></h4>
-                    <p>Mengikuti skema OpenAI API. Key: <code>prompt_tokens</code> dan <code>completion_tokens</code>.</p>
-                    <pre><span class="lb json">JSON</span>
-{
-  "id": "chatcmpl-ba343ecc800a",
-  "object": "chat.completion",
-  "created": 1785168782,
-  "model": "system-analyst",
-  "choices": [{
-    "message": { "role": "assistant", "content": "..." },
-    "finish_reason": "stop"
-  }],
-  "usage": {
-    "prompt_tokens": 16650,
-    "completion_tokens": 315,
-    "total_tokens": 16965
-  }
-}</pre>
-                </div>
-                <div>
-                    <h4 style="color:var(--pl);margin-bottom:10px">Endpoint: <code>/api/sessions/{id}/chat</code></h4>
-                    <p>Format Hermes-native. Key: <code>input_tokens</code> dan <code>output_tokens</code>. Tambahan field: <code>runtime</code> (durasi eksekusi dalam detik).</p>
-                    <pre><span class="lb json">JSON</span>
-{
-  "result": {
-    "role": "assistant",
-    "content": "Berikut ERD untuk modul User Account...",
-    "session_id": "api_1785212211_12b5637c"
-  },
-  "usage": {
-    "input_tokens": 16650,
-    "output_tokens": 315,
-    "total_tokens": 16965,
-    "runtime": 2.45
-  }
-}</pre>
-                </div>
+            <div class="ic a">
+                <div class="it"><span class="dot da"></span> Total Tokens</div>
+                <p>Total penjumlahan <code>prompt_tokens</code> + <code>completion_tokens</code> dalam 1 percakapan.</p>
             </div>
         </div>
 
-        <div class="ss" id="s2-3">
-            <div class="ssh"><span class="sn">2.3</span><h3>Fenomena: Pertumbuhan Prompt Tokens Per-Turn (Token Growth)</h3></div>
-            <div class="clo warn">
-                <div class="ci">&#9888;&#65039;</div>
-                <div class="cb"><div class="cl">Prompt Token Growth &mdash; Fenomena Kritis</div>
-                <p>Karena setiap turn menyertakan <strong>seluruh histori</strong> sebelumnya ke dalam prompt (LLM stateless per-request), <code>prompt_tokens</code> per-turn bertumbuh secara linear seiring bertambahnya jumlah turn. Ini adalah sifat fundamental arsitektur Transformer-based LLM, bukan bug Hermes. Semakin panjang percakapan, semakin tinggi biaya token per turn.</p></div>
+        <div class="clo evid">
+            <div class="ci">💡</div>
+            <div class="cb">
+                <div class="cl">Otomatis vs Manual (Token Counting)</div>
+                <p>
+                    <strong>Di Mode Stateful (`/api/sessions`):</strong> Server Hermes Gateway secara <strong>otomatis menghitung dan menjumlahkan akumulasi total token</strong> (`accumulated_usage`) dari awal sesi hingga pesan terakhir, lalu menyimpannya di database server. Tim tidak perlu menghitung manual!
+                </p>
             </div>
-            <div class="tw">
-                <table>
-                    <thead><tr><th>Turn</th><th>User Message</th><th>History Loaded</th><th>System Prompt</th><th>Total Prompt Tokens</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td>~20 tokens</td><td>0</td><td>~2,000</td><td>~2,020</td></tr>
-                        <tr><td>3</td><td>~20 tokens</td><td>~1,500</td><td>~2,000</td><td>~3,520</td></tr>
-                        <tr><td>10</td><td>~20 tokens</td><td>~8,000</td><td>~2,000</td><td>~10,020</td></tr>
-                        <tr><td>20</td><td>~20 tokens</td><td>~16,000</td><td>~2,000</td><td>~18,020</td></tr>
-                        <tr style="background:rgba(244,63,94,.05)"><td>50+</td><td>~20 tokens</td><td>&gt;60,000</td><td>~2,000</td><td><strong style="color:var(--ro)">&gt;62,000 &mdash; MENDEKATI LIMIT</strong></td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p style="font-size:.8rem;color:var(--di);margin-top:-10px">*Estimasi ilustratif berdasarkan pola token yang diobservasi dari sesi aktual Hermes.</p>
         </div>
-    </section>
+    </div>
 
     <!-- SECTION 3: STORAGE & MEMORY -->
-    <section class="sc" id="s3">
+    <div class="sc" id="sec-audience-storage">
         <div class="sh">
-            <div class="ib em">03</div>
+            <div class="ib cy">💾</div>
             <div class="stg">
-                <h2>Storage Architecture &amp; Memory Retention</h2>
-                <p>Lokasi fisik storage, skema SQLite internal, mekanisme context compression, dan kebijakan retensi data Hermes.</p>
+                <h2>3. Memory &amp; Storage Retention (Di Mana Chat Disimpan?)</h2>
+                <p>Kapasitas memori kerja AI dan durasi penyimpanan obrolan di server.</p>
             </div>
         </div>
 
-        <div class="ss" id="s3-1">
-            <div class="ssh"><span class="sn">3.1</span><h3>Arsitektur Storage: Hybrid SQLite + File System per Profile</h3></div>
-            <p>Hermes mengadopsi arsitektur <strong>Dual-Database, Dual-Layer Hybrid Storage</strong> yang terisolasi per profile. Tidak ada Redis, tidak ada PostgreSQL, tidak ada shared database lintas profile. Setiap profile memiliki direktori storage mandiri:</p>
+        <div class="g2">
+            <div class="ic v">
+                <div class="it"><span class="dot dv"></span> Short-Term Working Memory (Context Window)</div>
+                <p>
+                    Merupakan <strong>memori RAM kerja AI</strong> saat memproses obrolan. Berkapasitas 128k hingga 1M token (setara ratusan halaman dokumen). 
+                    Jika obrolan sangat panjang melampaui limit ini, Hermes Gateway otomatis melakukan <em>sliding window</em> / <em>summarization</em> agar obrolan tidak terputus.
+                </p>
+            </div>
+            <div class="ic e">
+                <div class="it"><span class="dot de"></span> Long-Term Storage (Persistence Database)</div>
+                <p>
+                    Merupakan <strong>database fisik disk</strong> tempat menyimpan riwayat pesan &amp; metadata sesi. Terletak di server Hermes <code>203.145.34.37</code> menggunakan SQLite / PostgreSQL database.
+                    <br><br>
+                    <strong>Durasi Simpan:</strong> Secara default **PERMANEN (Persistent)** sampai sesi dihapus via API (`DELETE /api/sessions/{id}`) atau kebijakan auto-purge admin.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: SERVER RESTART IMPACT (NEW) -->
+    <div class="sc" id="sec-audience-restart">
+        <div class="sh">
+            <div class="ib r">⚡</div>
+            <div class="stg">
+                <h2>4. Efek Server Restart pada Chat &amp; History (Apakah Hilang?)</h2>
+                <p>Penjelasan keamanan data saat server gateway mengalami reboot / restart.</p>
+            </div>
+        </div>
+
+        <div class="clo note">
+            <div class="ci">🛡️</div>
+            <div class="cb">
+                <div class="cl">Status Keamanan Chat Saat Server Restart</div>
+                <p>
+                    <strong>JAWABAN UTAMA: Chat &amp; History TETAP BERTAHAN 100% (TIDAK HILANG)!</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="g2">
+            <div class="ic e">
+                <div class="it"><span class="dot de"></span> Long-Term Disk Database (SQLite/PostgreSQL)</div>
+                <p>
+                    <strong>TETAP UTUH &amp; BERTAHAN:</strong> Seluruh riwayat pesan, metadata <code>session_id</code>, dan akumulasi token tersimpan secara permanen dalam file database fisik di disk server. Saat server di-restart, database disk ini tidak terpengaruh sama sekali.
+                </p>
+            </div>
+
+            <div class="ic a">
+                <div class="it"><span class="dot da"></span> Short-Term RAM Memory Cache</div>
+                <p>
+                    <strong>Di-flush dari RAM (Transient):</strong> Hanya cache memori kerja RAM sementara yang dibersihkan saat proses restart.
+                </p>
+            </div>
+        </div>
+
+        <div class="clo evid">
+            <div class="ci">🔄</div>
+            <div class="cb">
+                <div class="cl">Alur Otomatis Pasca-Restart</div>
+                <p>
+                    Begitu server selesai di-restart, pengguna atau aplikasi client <strong>dapat langsung melanjutkan obrolan</strong> (`POST /api/sessions/{session_id}/chat`) atau mengambil riwayat pesan (`GET /api/sessions/{session_id}/messages`). Server Hermes secara otomatis membaca kembali histori obrolan dari database disk dan membangun ulang memori konteks tanpa ada data yang hilang!
+                </p>
+            </div>
+        </div>
+
+        <!-- CONDITIONAL ARCHITECTURE MATRIX SUB-SECTION -->
+        <div style="margin-top: 32px; border-top: 1px solid var(--bc); padding-top: 24px;">
+            <h3 style="color: var(--br); margin-bottom: 12px;">📌 Matriks Komponen Kondisional vs Wajib dalam Arsitektur EKSAD</h3>
+            <p>Sama seperti RabbitMQ yang bersifat kondisional, beberapa komponen teknis berikut juga memiliki aturan kapan wajib digunakan vs kapan dapat dilewati (*skipped*):</p>
+            
             <div class="tw">
                 <table>
-                    <thead><tr><th>Komponen</th><th>Path Fisik di Server</th><th>Teknologi</th><th>Fungsi Utama</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Komponen Teknis</th>
+                            <th>Status Penggunaan</th>
+                            <th>Kapan Wajib DIGUNAKAN?</th>
+                            <th>Kapan BISA DILEWATI (Skipped)?</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><strong>Primary Chat Store</strong></td><td><code>~/.hermes/profiles/{profile}/response_store.db</code></td><td>SQLite 3</td><td>Tabel <code>conversations</code> (metadata sesi) dan <code>responses</code> (isi pesan + token count)</td></tr>
-                        <tr><td><strong>Runtime State DB</strong></td><td><code>~/.hermes/profiles/{profile}/state.db</code></td><td>SQLite 3</td><td>Metadata runtime: registrasi channel, cron job execution state, agent binding state</td></tr>
-                        <tr><td><strong>Session JSON Dumps</strong></td><td><code>~/.hermes/profiles/{profile}/sessions/*.json</code></td><td>File System JSON</td><td>Raw dump request/response per turn untuk debugging dan audit. Satu file per <code>session_id</code>.</td></tr>
-                        <tr><td><strong>Gateway Log</strong></td><td><code>~/.hermes/profiles/{profile}/logs/gateway.log</code></td><td>Plain Text</td><td>Log eksekusi HTTP request, binding event, kompresi konteks, dan error.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p>Skema SQLite aktual dari <code>response_store.db</code>, dikonfirmasi via inspeksi langsung menggunakan <code>inspect_sqlite_schema.py</code>:</p>
-            <pre><span class="lb sql">SQL &mdash; response_store.db schema (confirmed)</span>
-<span class="cmt">-- Tabel 1: Metadata sesi percakapan</span>
-<span class="kw">CREATE TABLE</span> conversations (
-    id          INTEGER  PRIMARY KEY AUTOINCREMENT,
-    session_id  TEXT     UNIQUE NOT NULL,
-    title       TEXT,
-    profile     TEXT,
-    created_at  REAL,    <span class="cmt">-- Unix timestamp float</span>
-    updated_at  REAL
-);
-
-<span class="cmt">-- Tabel 2: Pesan individual per turn percakapan</span>
-<span class="kw">CREATE TABLE</span> responses (
-    id                 INTEGER  PRIMARY KEY AUTOINCREMENT,
-    session_id         TEXT     REFERENCES conversations(session_id),
-    role               TEXT,    <span class="cmt">-- 'user' | 'assistant' | 'system'</span>
-    content            TEXT,
-    timestamp          REAL,
-    prompt_tokens      INTEGER,
-    completion_tokens  INTEGER
-);
-<span class="kw">CREATE INDEX</span> idx_responses_session ON responses(session_id, timestamp ASC);</pre>
-            <div class="clo note">
-                <div class="ci">&#8505;&#65039;</div>
-                <div class="cb"><div class="cl">Karakteristik SQLite dalam Konteks Hermes</div>
-                <p>SQLite dipilih karena sifatnya yang <em>serverless</em>, <em>zero-configuration</em>, dan <em>file-based</em> &mdash; cocok untuk deployment single-process Hermes. Trade-off: tidak mendukung concurrent writes tinggi. Dalam deployment Hermes saat ini, satu profile diakses satu gateway process, sehingga ini bukan bottleneck signifikan.</p></div>
-            </div>
-        </div>
-
-        <div class="ss" id="s3-2">
-            <div class="ssh"><span class="sn">3.2</span><h3>Teori Context Management: Mengapa Kompresi Diperlukan</h3></div>
-            <p>Semua model LLM berbasis Transformer memiliki <strong>context window finite</strong> &mdash; batas absolut jumlah token yang dapat diproses dalam satu inferensi. Arsitektur Transformer (Vaswani et al., 2017) memiliki kompleksitas komputasi <em>O(n&sup2;)</em> terhadap panjang sequence, sehingga menambah token memiliki biaya kuadratik terhadap komputasi dan memori.</p>
-            <p>Terdapat tiga strategi umum untuk menangani keterbatasan context window dalam percakapan panjang:</p>
-            <div class="g3">
-                <div class="ic r">
-                    <div class="it"><span class="dot dr"></span>Strategi A: Hard Truncation</div>
-                    <p>Memotong histori lama begitu saja. Sederhana implementasinya, tetapi agent kehilangan konteks bisnis penting dari awal percakapan. <em>Tidak digunakan Hermes.</em></p>
-                </div>
-                <div class="ic a">
-                    <div class="it"><span class="dot da"></span>Strategi B: RAG Retrieval</div>
-                    <p>Simpan histori di vector database, ambil hanya bagian relevan secara semantik menggunakan embedding similarity. Akurat namun memerlukan infrastruktur embedding model terpisah.</p>
-                </div>
-                <div class="ic e">
-                    <div class="it"><span class="dot de"></span>Strategi C: Summarization</div>
-                    <p>Ringkas histori lama menjadi poin kunci menggunakan LLM yang sama, gabungkan dengan histori terbaru. <em>Ini yang diimplementasikan Hermes.</em></p>
-                </div>
-            </div>
-            <p>Strategi C yang dipilih Hermes dikenal dalam literatur NLP sebagai <strong>Hierarchical Compression</strong> atau <strong>Progressive Summarization</strong>. Teknik ini mempertahankan <em>semantic coherence</em> percakapan dengan mengorbankan detail verbatim dari histori lama &mdash; trade-off yang dapat diterima untuk percakapan domain-specific yang terstruktur.</p>
-        </div>
-
-        <div class="ss" id="s3-3">
-            <div class="ssh"><span class="sn">3.3</span><h3>Implementasi: Sliding Window Compression dengan Summarization</h3></div>
-            <p>Hermes mengimplementasikan teknik ini melalui komponen <code>context_compressor</code> yang dipanggil via slash command <code>/compress</code> (dari <code>slash_commands.py</code>) atau otomatis oleh gateway saat token usage mendekati threshold batas aman model LLM yang digunakan.</p>
-            <div class="flow">
-                <div class="fst">
-                    <div class="num2 pu">A</div>
-                    <div class="sb2">
-                        <div class="st2">Deteksi Threshold &amp; Trigger Kompresi</div>
-                        <p>Gateway memantau <code>agent.session_total_tokens</code> setelah setiap turn. Ketika mendekati batas aman (~80% dari max context window model LLM), atau ketika user mengetikkan slash command <code>/compress</code>, proses kompresi diaktifkan.</p>
-                        <p><em>Source: handler <code>/compress</code> di <code>slash_commands.py</code></em></p>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 em">B</div>
-                    <div class="sb2">
-                        <div class="st2">Split History: Head (lama) vs Tail (terbaru)</div>
-                        <p>Seluruh riwayat percakapan dibagi menjadi dua partisi berdasarkan sliding window cursor:</p>
-                        <ul>
-                            <li><strong>Head</strong>: Semua pesan kecuali N turn terbaru &mdash; bagian yang akan dikompresi.</li>
-                            <li><strong>Tail</strong>: N turn percakapan paling akhir &mdash; dipertahankan verbatim karena paling relevan dengan konteks kerja saat ini.</li>
-                        </ul>
-                        <p>Nilai N (jumlah turn tail yang dipertahankan) adalah parameter yang dapat dikonfigurasi di profil agent.</p>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 cy">C</div>
-                    <div class="sb2">
-                        <div class="st2">LLM-Based Summarization pada Head</div>
-                        <p>Pesan di bagian Head dikirimkan ke LLM dengan instruksi khusus untuk menghasilkan ringkasan terstruktur, mencakup:</p>
-                        <ul>
-                            <li>Keputusan desain utama yang telah diambil</li>
-                            <li>Artefak atau deliverable yang sudah dihasilkan (ERD, DDL, flowchart, dll.)</li>
-                            <li>Konteks bisnis atau domain yang telah dibangun bersama</li>
-                            <li>Constraint dan asumsi yang sudah disepakati</li>
-                        </ul>
-                        <p>Ringkasan direpresentasikan sebagai satu pesan <code>"role": "system"</code> berlabel <em>[COMPRESSED HISTORY SUMMARY]</em>.</p>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 am">D</div>
-                    <div class="sb2">
-                        <div class="st2">Rejoin: [Summary Message] + [Tail Messages]</div>
-                        <p>Context baru yang digunakan pada turn berikutnya: <code>[System Prompt] + [Summary Message] + [Tail Messages]</code>. Total token turun drastis (misal: dari 80,000 ke 10,000&ndash;15,000) tanpa kehilangan konteks bisnis utama.</p>
-                        <pre><span class="lb json">messages[] setelah kompresi</span>
-[
-  { "role": "system", "content": "[SYSTEM PROMPT penuh profile agent]" },
-  { "role": "system", "content": "[COMPRESSED HISTORY SUMMARY]\n- ERD User Account sudah dibuat (8 tabel)\n- Kolom audit trail sudah ditambahkan\n- Constraint: UUID v4 untuk PK, soft delete via deleted_at\n- Keputusan: PostgreSQL sebagai target database\n..." },
-  { "role": "user",      "content": "Pesan turn ke-18 (awal tail)" },
-  { "role": "assistant", "content": "Response turn ke-18" },
-  { "role": "user",      "content": "Pesan user saat ini" }
-]</pre>
-                    </div>
-                </div>
-                <div class="fst">
-                    <div class="num2 pu">E</div>
-                    <div class="sb2">
-                        <div class="st2">Persist ke SQLite &mdash; Summary Menggantikan Head</div>
-                        <p>Summary message disimpan ke <code>response_store.db</code> menggantikan seluruh baris head yang dikompresi. Sehingga endpoint <code>GET /api/sessions/{id}/messages</code> berikutnya sudah mengembalikan versi terkompresi, bukan histori mentah.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="clo ins">
-                <div class="ci">&#129504;</div>
-                <div class="cb"><div class="cl">Trade-off yang Perlu Dipahami</div>
-                <p>Teknik summarization memiliki trade-off inheren: <strong>detail verbatim percakapan lama hilang permanen</strong> setelah kompresi. Jika user bertanya "Apa tepatnya yang Anda katakan 3 jam lalu tentang tabel X?", agent mungkin tidak menjawab dengan akurasi penuh karena hanya memiliki ringkasan. Ini adalah trade-off yang disadari demi keberlanjutan percakapan jangka panjang dalam batas context window finite model LLM.</p></div>
-            </div>
-        </div>
-
-        <div class="ss" id="s3-4">
-            <div class="ssh"><span class="sn">3.4</span><h3>Kebijakan Retensi Data &amp; Data Lifecycle Management</h3></div>
-            <div class="ic e" style="margin-bottom:20px">
-                <div class="it"><span class="dot de"></span>Kebijakan Default: Retensi INDEFINITE (Permanen)</div>
-                <p>Tidak ada TTL (Time-To-Live) otomatis. Data percakapan tersimpan di SQLite tanpa batas waktu selama file <code>response_store.db</code> ada di filesystem server. Tidak ada cron job housekeeping yang berjalan secara default. Skema database tidak memiliki kolom <code>expires_at</code> atau mekanisme expiry apapun.</p>
-            </div>
-            <p>Data hanya dapat dihapus melalui tiga mekanisme eksplisit:</p>
-            <div class="g3">
-                <div class="ic r">
-                    <div class="it"><span class="dot dr"></span>1. HTTP API Delete</div>
-                    <p>Client memanggil <code>DELETE /api/sessions/{session_id}</code>. Server melakukan cascade delete dari tabel <code>conversations</code> + seluruh <code>responses</code> terkait.</p>
-                </div>
-                <div class="ic a">
-                    <div class="it"><span class="dot da"></span>2. CLI Memory Prune</div>
-                    <p>Administrator menjalankan <code>hermes memory prune</code> dari terminal server. Menghapus sesi-sesi lama secara batch berdasarkan kriteria tertentu (usia, profile, dll.).</p>
-                </div>
-                <div class="ic v">
-                    <div class="it"><span class="dot dv"></span>3. Manual File Deletion</div>
-                    <p>Menghapus langsung file <code>response_store.db</code> dari filesystem. Tidak direkomendasikan karena berisiko merusak integritas referensial antar tabel dan state.db.</p>
-                </div>
-            </div>
-            <div class="tw">
-                <table>
-                    <thead><tr><th>Operasi Lifecycle</th><th>Endpoint / Command</th><th>Dampak Storage</th></tr></thead>
-                    <tbody>
-                        <tr><td>Buat sesi baru</td><td><code>POST /api/sessions</code></td><td>INSERT ke tabel <code>conversations</code></td></tr>
-                        <tr><td>Kirim/terima pesan</td><td><code>POST /api/sessions/{id}/chat</code></td><td>INSERT ke <code>responses</code> (1 user + 1 assistant row per turn)</td></tr>
-                        <tr><td>Baca histori</td><td><code>GET /api/sessions/{id}/messages</code></td><td>SELECT dari <code>responses</code> &mdash; read-only, tidak ada modifikasi</td></tr>
-                        <tr><td>Kompres histori</td><td><code>/compress</code> atau auto-trigger</td><td>DELETE head rows + INSERT summary row di <code>responses</code></td></tr>
-                        <tr><td>Hapus sesi</td><td><code>DELETE /api/sessions/{id}</code></td><td>Cascade DELETE dari tabel <code>conversations</code> + <code>responses</code></td></tr>
-                        <tr><td>Prune semua sesi profile</td><td><code>hermes memory prune</code></td><td>Batch DELETE dari kedua tabel berdasarkan kriteria admin</td></tr>
+                        <tr>
+                            <td><strong>RabbitMQ Broker</strong></td>
+                            <td><span style="background:rgba(245,158,11,0.2);color:var(--am);padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">KONDISIONAL</span></td>
+                            <td>Communication Asinkron (Pub/Sub event), background audit log, notification queue, &amp; DLQ retry.</td>
+                            <td>Microservice murni <strong>Synchronous REST API</strong> (misal: lookup master data reference).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Flyway DDL &amp; 7 Audit Columns</strong></td>
+                            <td><span style="background:rgba(245,158,11,0.2);color:var(--am);padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">KONDISIONAL</span></td>
+                            <td>Microservice yang memiliki <strong>Datastore RDBMS tersendiri</strong> (PostgreSQL).</td>
+                            <td>Microservice berupa <strong>Stateless Proxy / API Aggregator</strong> tanpa database internal.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RBAC <code>@RolesAllowed</code></strong></td>
+                            <td><span style="background:rgba(245,158,11,0.2);color:var(--am);padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">KONDISIONAL</span></td>
+                            <td>Endpoint internal/back-office yang memerlukan proteksi hak akses terisolasi per-role.</td>
+                            <td>Endpoint Publik, Anonymous Callback Webhook, Health Check (`/health`), &amp; Prometheus Metrics.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>STRIDE Threat Modeling Docs</strong></td>
+                            <td><span style="background:rgba(245,158,11,0.2);color:var(--am);padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">KONDISIONAL</span></td>
+                            <td>Service yang mengelola data sensitif (PII Karyawan, Payroll/Gaji, Financial Data, Credentials).</td>
+                            <td>Service utilitas internal berisiko rendah di mana analisis keamanan disimpulkan ringkas dalam TSD.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quarkus Mutiny Reactive</strong></td>
+                            <td><span style="background:rgba(99,102,241,0.2);color:var(--pl);padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">STANDAR TIER-1</span></td>
+                            <td>Pilihan Stack Tier-1 EKSAD untuk performa tinggi &amp; low RAM Kubernetes footprint.</td>
+                            <td>Stack Tier-2 Imperative (Spring Boot 3.x) yang menggunakan blocking thread pool biasa.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- SECTION 4: QUICK REFERENCE -->
-    <section class="sc" id="s4">
+    <!-- SECTION 5: EXECUTIVE FAQ BRIEFING -->
+    <div class="sc" id="sec-audience-faq">
         <div class="sh">
-            <div class="ib am">04</div>
+            <div class="ib em">❓</div>
             <div class="stg">
-                <h2>Quick Reference Card</h2>
-                <p>Ringkasan endpoint, parameter wajib, dan header HTTP untuk kebutuhan integrasi cepat.</p>
+                <h2>5. Executive FAQ Briefing (Jawaban Pertanyaan Leader)</h2>
+                <p>Ringkasan jawaban cepat atas pertanyaan penting yang sering diajukan Management / Leader.</p>
             </div>
         </div>
-        <div class="tw">
-            <table>
-                <thead><tr><th>Kebutuhan</th><th>Method &amp; Endpoint</th><th>Key Parameters</th><th>Response Key</th></tr></thead>
-                <tbody>
-                    <tr><td>Buat sesi baru</td><td><code>POST /api/sessions</code></td><td><code>title</code> (string)</td><td><code>session_id</code></td></tr>
-                    <tr><td>Kirim pesan &amp; dapatkan respon</td><td><code>POST /api/sessions/{id}/chat</code></td><td><code>message</code> (string)</td><td><code>result.content</code>, <code>usage</code></td></tr>
-                    <tr><td>Ambil histori percakapan</td><td><code>GET /api/sessions/{id}/messages</code></td><td>&mdash;</td><td><code>data[]</code> array</td></tr>
-                    <tr><td>Daftar semua sesi</td><td><code>GET /api/sessions</code></td><td><code>limit</code>, <code>offset</code></td><td><code>sessions[]</code></td></tr>
-                    <tr><td>Hapus sesi</td><td><code>DELETE /api/sessions/{id}</code></td><td>&mdash;</td><td><code>deleted: true</code></td></tr>
-                    <tr><td>OpenAI-compatible chat</td><td><code>POST /v1/chat/completions</code></td><td><code>messages[]</code>, <code>model</code></td><td><code>choices[0].message.content</code>, <code>usage</code></td></tr>
-                    <tr><td>Kompres konteks (manual)</td><td>Kirim pesan <code>/compress</code></td><td>&mdash;</td><td>Konfirmasi teks dari agent</td></tr>
-                    <tr><td>Cek usage token per turn</td><td>Field <code>usage</code> di setiap response</td><td>&mdash;</td><td><code>input_tokens</code>, <code>output_tokens</code>, <code>total_tokens</code></td></tr>
-                </tbody>
-            </table>
-        </div>
-        <h4 style="margin-top:24px;margin-bottom:12px">HTTP Headers Penting</h4>
-        <div class="tw">
-            <table>
-                <thead><tr><th>Header</th><th>Nilai</th><th>Fungsi</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Authorization</code></td><td><code>Bearer &lt;API_SERVER_KEY&gt;</code></td><td>Autentikasi wajib untuk semua request</td></tr>
-                    <tr><td><code>Content-Type</code></td><td><code>application/json</code></td><td>Wajib untuk semua request POST</td></tr>
-                    <tr><td><code>X-Hermes-Session-Id</code></td><td><code>api_1785212211_12b5637c</code></td><td>Upgrade /v1/chat/completions menjadi stateful session</td></tr>
-                    <tr><td><code>X-Hermes-Session-Key</code></td><td>UUID internal</td><td>Binding ke specific agent process instance (advanced use)</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
 
-    <!-- SECTION 5: SOURCE EVIDENCE MAP -->
-    <section class="sc" id="s5">
-        <div class="sh">
-            <div class="ib">05</div>
-            <div class="stg">
-                <h2>Source Evidence Map</h2>
-                <p>Peta ketertelusuran klaim teknis dalam dokumen ini ke source code aktual Hermes. Bebas halusinasi.</p>
+        <div class="faq-box">
+            <div class="faq-question">Q1: Bagaimana manajemen `session_id` &amp; Chat History per user? <span>▼</span></div>
+            <div class="faq-answer">
+                Aplikasi Frontend menyimpan pemetaan <code>user_id</code> &harr; <code>session_id</code>. Ketika pengguna membuka kembali aplikasi, client memanggil `GET /api/sessions/{session_id}/messages` untuk menampilkan seluruh obrolan lama dari database server.
             </div>
         </div>
-        <p>Seluruh pernyataan teknis dalam dokumen ini dapat ditelusuri ke sumber berikut. Dokumen ini tidak mengandung asumsi spekulatif yang tidak dapat diverifikasi.</p>
+
+        <div class="faq-box">
+            <div class="faq-question">Q2: Bagaimana cara membaca Total Token per Session? Auto atau Manual? <span>▼</span></div>
+            <div class="faq-answer">
+                <strong>OTOMATIS (Auto)</strong>. Setiap respons API memberikan objek `usage` (`prompt_tokens`, `completion_tokens`, `total_tokens`). Pada mode `/api/sessions`, server Hermes otomatis menghitung akumulasi total token dari awal sesi hingga akhir (`accumulated_usage`).
+            </div>
+        </div>
+
+        <div class="faq-box">
+            <div class="faq-question">Q3: Seberapa besar Memory-nya, di mana disimpan, dan berapa lama chat disimpan? <span>▼</span></div>
+            <div class="faq-answer">
+                Memori kerja (Context Window) sebesar 128k–1M token dengan auto-summarization jika penuh. Chat history disimpan fisik di server database Hermes (`203.145.34.37`) dan bersifat **PERMANEN** sampai dihapus oleh admin / user via API.
+            </div>
+        </div>
+
+        <div class="faq-box">
+            <div class="faq-question">Q4: Jika server Hermes di-restart, apakah chat dan history obrolan akan hilang atau tetap bertahan? <span>▼</span></div>
+            <div class="faq-answer">
+                <strong>TETAP BERTAHAN (Intact &amp; Persistent 100%)</strong>. Histori obrolan tersimpan di database fisik disk (`SQLite/PostgreSQL`). Saat server restart, hanya cache RAM sementara yang dibersihkan, sedangkan seluruh pesan dan `session_id` tetap aman. Pengguna bisa langsung menyambung obrolan pasca-restart tanpa ada data yang hilang!
+            </div>
+        </div>
+
+        <div class="faq-box">
+            <div class="faq-question">Q5: Bagaimana alur melanjutkan obrolan? API-nya sama atau beda? <span>▼</span></div>
+            <div class="faq-answer">
+                <strong>API-nya SAMA</strong> yaitu `POST /api/sessions/{session_id}/chat`. Cukup sertakan `session_id` yang sama pada URL path. Gateway akan menarik konteks obrolan lama dari DB secara otomatis tanpa perlu client mengirimkan ulang pesan dari awal.
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: DEVELOPER SERVER & AUTH CREDENTIALS -->
+    <div class="sc" id="sec-dev-connection">
+        <div class="sh">
+            <div class="ib bp">💻</div>
+            <div class="stg">
+                <h2>6. Server &amp; Auth Credentials (Developer Guide)</h2>
+                <p>Kredensial koneksi server remote dan token otentikasi API Gateway.</p>
+            </div>
+        </div>
+
         <div class="tw">
             <table>
-                <thead><tr><th>Klaim Teknis</th><th>Source File</th><th>Bukti Verifikasi</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Nilai Konfigurasi</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    <tr><td>Fungsi <code>_bind_api_server_session()</code> sebagai context injector</td><td><code>gateway/platforms/api_server.py</code></td><td>Nama fungsi dan pola pemanggilan dikonfirmasi dari inspeksi source langsung</td></tr>
-                    <tr><td>Atribut token: <code>session_prompt_tokens</code>, <code>session_completion_tokens</code>, <code>session_total_tokens</code></td><td><code>gateway/platforms/api_server.py</code></td><td>Dikonfirmasi dari dump object agent di session aktif saat runtime</td></tr>
-                    <tr><td>Format <code>session_id</code>: <code>api_{timestamp}_{hash}</code></td><td><code>api_server.py</code></td><td>Dikonfirmasi dari nilai aktual: <code>api_1785212211_12b5637c</code></td></tr>
-                    <tr><td>Slash command <code>/compress</code> dan logika Head/Tail split</td><td><code>gateway/slash_commands.py</code></td><td>Handler <code>/compress</code> dikonfirmasi dari inspeksi file slash_commands.py</td></tr>
-                    <tr><td>Skema tabel <code>conversations</code> dan <code>responses</code> di SQLite</td><td><code>~/.hermes/profiles/*/response_store.db</code></td><td>Schema diekstrak langsung via script <code>inspect_sqlite_schema.py</code></td></tr>
-                    <tr><td>Path fisik storage: <code>~/.hermes/profiles/{profile}/</code></td><td>File system inspection</td><td>Direktori dikonfirmasi dari output <code>fetch_hermes_details.py</code></td></tr>
-                    <tr><td>Retensi data INDEFINITE tanpa TTL otomatis</td><td><code>response_store.db</code> schema</td><td>Skema tidak memiliki kolom <code>expires_at</code> atau mekanisme TTL apapun</td></tr>
-                    <tr><td>Format JSON response <code>usage</code> per endpoint</td><td><code>api_server.py</code></td><td>Response structure dikonfirmasi dari output aktual API call ke server Hermes</td></tr>
-                    <tr><td>Token nyata: prompt_tokens=16650, completion_tokens=315</td><td>Runtime API response</td><td>Nilai dikonfirmasi dari sesi aktual <code>api_1785212211_12b5637c</code></td></tr>
+                    <tr>
+                        <td><strong>Server Remote IP</strong></td>
+                        <td><code>203.145.34.37</code></td>
+                        <td>IP Server Gateway EKSAD Office</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSH Access</strong></td>
+                        <td><code>ssh eksadpro@203.145.34.37</code></td>
+                        <td>Akses SSH untuk admin server</td>
+                    </tr>
+                    <tr>
+                        <td><strong>System Analyst Port</strong></td>
+                        <td><code>http://203.145.34.37:8643</code></td>
+                        <td>Model: <code>MiniMax-M2</code> (TSD, DDL, API, Event Architecture)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business Analyst Port</strong></td>
+                        <td><code>http://203.145.34.37:8642</code></td>
+                        <td>Model: <code>anthropic/claude-sonnet-4</code> (BRD, FSD, User Stories)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bearer Token (`API_SERVER_KEY`)</strong></td>
+                        <td><code>10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9</code></td>
+                        <td>Wajib dimasukkan pada Header <code>Authorization: Bearer &lt;KEY&gt;</code></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-        <div class="clo crit">
-            <div class="ci">&#128683;</div>
-            <div class="cb"><div class="cl">Disclaimer Bebas Halusinasi</div>
-            <p>Dokumen ini secara ketat hanya mencantumkan informasi yang dapat ditelusuri ke source code, inspeksi database, atau output runtime aktual Hermes. Tidak ada angka, nama fungsi, nama tabel, path file, atau perilaku sistem yang diasumsikan atau dikarang. Jika terdapat aspek teknis yang tidak diketahui secara pasti, hal tersebut tidak dicantumkan dalam dokumen ini.</p></div>
-        </div>
-    </section>
+    </div>
 
-    <footer>
-        <div>EKSAD Agentic Knowledge Framework &copy; 2026</div>
-        <div style="margin-top:4px">Hermes Agentic Gateway &mdash; Technical Architecture &amp; Integration Specification</div>
-        <div style="margin-top:4px;font-size:.76rem;color:var(--di)">v2.3 &mdash; Verified against api_server.py, slash_commands.py, response_store.db</div>
-        <div style="margin-top:20px"><a href="../index.html" style="color:var(--pl);text-decoration:none;font-size:.83rem">&#8592; Kembali ke Hermes Documentation Portal</a></div>
+    <!-- SECTION 7: API ENDPOINT CONTRACTS -->
+    <div class="sc" id="sec-dev-endpoints">
+        <div class="sh">
+            <div class="ib bc2">⚡</div>
+            <div class="stg">
+                <h2>7. API Endpoint Contracts &amp; Code Examples</h2>
+                <p>Spesifikasi teknis cURL request &amp; JSON response per endpoint.</p>
+            </div>
+        </div>
+
+        <!-- 7.1 Create Session -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">POST</span>
+                <h3>7.1 Create New Session (`/api/sessions`)</h3>
+            </div>
+            <p>Membuat sesi percakapan baru di server Hermes. Mengembalikan <code>session_id</code> unik.</p>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions" \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Session Jovan - HRIS Service TSD Design",
+    "user_context": {
+      "user_id": "USR-10293",
+      "role": "System Analyst"
+    }
+  }'</code></pre>
+
+<pre><span class="lb json">201 Created Response</span><code>{
+  "status": "success",
+  "session_id": "api_1785212211_12b5637c",
+  "title": "Session Jovan - HRIS Service TSD Design",
+  "created_at": 1785212211
+}</code></pre>
+        </div>
+
+        <!-- 7.2 Send Chat -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">POST</span>
+                <h3>7.2 Send Chat to Session (`/api/sessions/{session_id}/chat`)</h3>
+            </div>
+            <p>Mengirimkan pesan ke sesi aktif. Server otomatis mengambil konteks obrolan lama dari database (bahkan pasca server restart).</p>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat" \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Tolong buatkan skrip Flyway DDL PostgreSQL untuk modul LeaveRequest dengan 7 audit columns wajib EKSAD."
+  }'</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "session_id": "api_1785212211_12b5637c",
+  "message_id": "msg_998231",
+  "role": "assistant",
+  "content": "Berikut adalah skrip Flyway DDL V1__init_hris_schema.sql...\n\nCREATE TABLE hris_leave_request (...",
+  "usage": {
+    "prompt_tokens": 1420,
+    "completion_tokens": 530,
+    "total_tokens": 1950
+  },
+  "created_at": 1785212215
+}</code></pre>
+        </div>
+
+        <!-- 7.3 Get History -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">GET</span>
+                <h3>7.3 Get Session Messages History (`/api/sessions/{session_id}/messages`)</h3>
+            </div>
+            <p>Mengambil seluruh rekam jejak obrolan dan akumulasi pemakaian token dari database server.</p>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages" \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+        </div>
+    </div>
+
+    <!-- SECTION 8: POSTMAN COLLECTION IMPORT -->
+    <div class="sc" id="sec-dev-postman">
+        <div class="sh">
+            <div class="ib am">📬</div>
+            <div class="stg">
+                <h2>8. Panduan Impor Postman Collection</h2>
+                <p>4 langkah mudah menggunakan Postman Collection EKSAD Hermes.</p>
+            </div>
+        </div>
+
+        <div class="flow">
+            <div class="fst">
+                <div class="num2 pu">1</div>
+                <div class="sb2">
+                    <div class="st2">Unduh / Buka File Collection JSON</div>
+                    <p>File collection siap pakai berada di repositori:</p>
+                    <ul>
+                        <li><strong>System Analyst (SA):</strong> <code>hermes-documentation/system-analyst/Hermes_System_Analyst_Postman_Collection.json</code></li>
+                        <li><strong>Business Analyst (BA):</strong> <code>hermes-documentation/business-analyst/Hermes_Business_Analyst_Postman_Collection.json</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="fst">
+                <div class="num2 em">2</div>
+                <div class="sb2">
+                    <div class="st2">Buka Aplikasi Postman &amp; Klik "Import"</div>
+                    <p>Buka Postman Desktop, klik tombol <strong>Import</strong> di pojok kiri atas, lalu Drag &amp; Drop file JSON tersebut.</p>
+                </div>
+            </div>
+
+            <div class="fst">
+                <div class="num2 cy">3</div>
+                <div class="sb2">
+                    <div class="st2">Otomatisasi Environment Variables</div>
+                    <p>Variabel <code>baseUrl</code> (http://203.145.34.37:8643) dan <code>apiKey</code> (Bearer Token) sudah terkonfigurasi otomatis dalam collection!</p>
+                </div>
+            </div>
+
+            <div class="fst">
+                <div class="num2 am">4</div>
+                <div class="sb2">
+                    <div class="st2">Jalankan Request &amp; Test Endpoint</div>
+                    <p>Jalankan <code>Health Check</code>, <code>Create Session</code>, dan <code>Send Chat</code> langsung dari Postman!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 9: PROMPT TEMPLATES -->
+    <div class="sc" id="sec-dev-prompts">
+        <div class="sh">
+            <div class="ib vi">📝</div>
+            <div class="stg">
+                <h2>9. Prompt Templates Siap Pakai</h2>
+                <p>Template komunikasi presisi profesional bebas halusinasi.</p>
+            </div>
+        </div>
+
+        <h4>A. Prompt Teknis (Untuk Verifikasi Dev Team / AI)</h4>
+<pre><span class="lb py">Prompt Template A</span><code>Saya sedang mengintegrasikan Hermes Agentic Gateway dengan sistem internal kami. Tolong berikan penjelasan teknis dan arsitektur yang presisi tanpa asumsi yang spekulatif (bebas halusinasi) terkait poin-poin berikut:
+
+1. Session Management & Chat History:
+   - Bagaimana mekanisme pemetaan session_id dan user_context pada endpoint /api/sessions vs /v1/chat/completions?
+   - Bagaimana alur memanggil histori pesan sebelumnya (GET /api/sessions/{session_id}/messages) dan menyambung obrolan (POST /api/sessions/{session_id}/chat)?
+
+2. Token Accounting & Tracking:
+   - Apakah Hermes secara otomatis menghitung dan mengumpulkan statistik prompt_tokens, completion_tokens, dan total_tokens per session_id di database server?
+
+3. Storage & Memory Retention & Server Restart:
+   - Di mana lokasi fisik penyimpanan chat history dan artefak (SQLite, PostgreSQL, Redis, atau File System)?
+   - Apakah histori obrolan dan session_id tetap bertahan aman 100% jika server gateway di-restart?</code></pre>
+
+        <h4>B. Executive Briefing Prompt (Untuk Laporan ke Leader / Management)</h4>
+<pre><span class="lb json">Prompt Template B</span><code>Buatkan Executive Summary dan Technical Briefing sederhana yang mudah dipahami oleh Management / Leader mengenai integrasi Hermes Agentic Gateway.
+
+Fokus ringkasan:
+1. Cara kerja Session ID dan kelanjutan obrolan (Chat History persistence).
+2. Keamanan data saat server di-restart (Persistent Database Storage di Disk Server).
+3. Mekanisme penghitungan otomatis penggunaan Token (Cost & Usage Accounting per user session).
+4. Rekomendasi API Contract & Postman Collection untuk tim pengembang (Developer).
+
+Gunakan bahasa profesional, jelas, dan format ringkas (bullet points & tabel).</code></pre>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align:center;padding-top:40px;border-top:1px solid var(--bc);color:var(--di);font-size:.85rem">
+        <p>&copy; 2026 PT EKSAD Solusi Digital — EKSAD Agentic Knowledge Framework</p>
     </footer>
+
 </main>
+
 <script>
-    const links = document.querySelectorAll('.ta');
-    const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                links.forEach(l => l.classList.remove('active'));
-                const a = document.querySelector(`.ta[href="#${e.target.id}"]`);
-                if (a) a.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-15% 0px -75% 0px' });
-    document.querySelectorAll('[id]').forEach(s => obs.observe(s));
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
 </script>
 </body>
 </html>

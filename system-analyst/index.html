@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes System Analyst Profile: Documentation & Postman Test Guide</title>
+    <title>Hermes System Analyst Profile: Documentation &amp; Postman Test Guide</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,6 +21,8 @@
             
             --accent-cyan: #06b6d4;
             --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
             
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -151,7 +153,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 16px;
-            margin: 24px 0;
+            margin: 24px 0 32px 0;
         }
 
         .info-box {
@@ -214,6 +216,23 @@
             margin-top: 24px;
         }
 
+        .req-card {
+            background: rgba(10, 15, 28, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .req-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         pre {
             background: #060911;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -225,7 +244,23 @@
             font-size: 0.88rem;
             color: #e2e8f0;
             margin-bottom: 24px;
+            position: relative;
         }
+
+        .code-label {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: var(--font-code);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 0 10px 0 8px;
+        }
+        .lbl-req { background: rgba(99,102,241,0.2); color: var(--primary-light); border: 1px solid rgba(99,102,241,0.3); }
+        .lbl-res { background: rgba(16,185,129,0.2); color: var(--accent-emerald); border: 1px solid rgba(16,185,129,0.3); }
 
         code {
             font-family: var(--font-code);
@@ -255,7 +290,7 @@
 
 <div class="container">
     <nav class="top-nav">
-        <a href="../index.html" class="back-link">← Kembali ke Home Page Portal</a>
+        <a href="../index.html" class="back-link">&larr; Kembali ke Home Page Portal</a>
         <div style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-dim);">
             System Analyst Profile (Port 8643)
         </div>
@@ -263,7 +298,7 @@
 
     <header>
         <div class="badge-profile">PROFILE: SYSTEM ANALYST</div>
-        <h1>Hermes System Analyst Integration & Postman Guide</h1>
+        <h1>Hermes System Analyst Integration &amp; Postman Guide</h1>
         <p class="subtitle">Dokumentasi integrasi khusus profile <strong>system-analyst</strong> pada Port 8643 mencakup panduan pengujian Postman Collection lengkap untuk penyusunan TSD, Flyway DDL, dan RabbitMQ Schemas.</p>
     </header>
 
@@ -289,28 +324,28 @@
 
     <!-- Section 1: Scope & Capability -->
     <section class="section-card">
-        <h2>Cakupan & Peran Agen System Analyst</h2>
+        <h2>Cakupan &amp; Peran Agen System Analyst</h2>
         <p>Profile <code>system-analyst</code> bertugas merancang arsitektur sistem teknis yang konsisten dengan standar EKSAD:</p>
         <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.98rem;">
             <li><strong>TSD (Technical Specification Document)</strong> — Penulisan dokumen spesifikasi teknis lengkap.</li>
-            <li><strong>Data Model & Flyway DDL</strong> — Desain skema database SQL migration sesuai konvensi EKSAD (auto audit trail).</li>
-            <li><strong>API Contract Design</strong> — Katalog endpoint REST API, struktur request/response JSON.</li>
-            <li><strong>RabbitMQ Event Schemas</strong> — Desain event envelope untuk komunikasi asinkron antar microservice.</li>
-            <li><strong>Sequence Diagrams</strong> — Diagram alur request-response dan event flow berbasis ASCII/Mermaid.</li>
+            <li><strong>Data Model &amp; Flyway DDL</strong> — Desain skema database SQL migration sesuai konvensi EKSAD (7 audit columns: <code>tenant_id</code>, <code>created_at</code>, <code>created_by</code>, <code>updated_at</code>, <code>updated_by</code>, <code>deleted_at</code>, <code>deleted_by</code>).</li>
+            <li><strong>API Contract Design</strong> — Katalog endpoint REST API, proteksi RBAC <code>@RolesAllowed</code>, dan struktur request/response JSON.</li>
+            <li><strong>RabbitMQ Event Schemas</strong> — Desain event envelope untuk komunikasi asinkron antar microservice (<code>exc-{domain}</code>). <em>*Catatan: Digunakan kondisional bila service membutuhkan event-driven architecture / async audit logging. Jika service murni Synchronous REST API, RabbitMQ dapat dilewati.</em></li>
+            <li><strong>Sequence &amp; AppSec STRIDE Modeling</strong> — Diagram alur request-response dan pemetaan ancaman keamanan STRIDE.</li>
         </ul>
     </section>
 
     <!-- Section 2: Postman Collection Test -->
     <section class="section-card">
-        <h2>Postman Collection & Test Guide</h2>
-        <p>File koleksi Postman v2.1 resmi untuk profile System Analyst telah disiapkan di folder ini:</p>
+        <h2>Postman Collection &amp; Test Guide</h2>
+        <p>File koleksi Postman v2.2 resmi untuk profile System Analyst telah disiapkan di folder ini:</p>
 
         <a href="./Hermes_System_Analyst_Postman_Collection.json" download class="download-btn">
             📥 Download Hermes_System_Analyst_Postman_Collection.json
         </a>
 
         <div style="margin-top: 32px;">
-            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, & Skenario Penggunaannya:</h3>
+            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, &amp; Skenario Penggunaannya:</h3>
             <div style="overflow-x: auto; margin-bottom: 24px;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; border: 1px solid var(--border-card); border-radius: 8px;">
                     <thead>
@@ -318,8 +353,8 @@
                             <th style="padding: 12px 14px; text-align: left; min-width: 140px;">Folder</th>
                             <th style="padding: 12px 14px; text-align: left; min-width: 170px;">Nama Request</th>
                             <th style="padding: 12px 14px; text-align: center; width: 80px;">Method</th>
-                            <th style="padding: 12px 14px; text-align: left; min-width: 180px;">Endpoint & Parameter</th>
-                            <th style="padding: 12px 14px; text-align: left; min-width: 220px;">Fungsi & Kegunaan Utama</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 180px;">Endpoint &amp; Parameter</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 220px;">Fungsi &amp; Kegunaan Utama</th>
                             <th style="padding: 12px 14px; text-align: left; min-width: 240px;">Skenario Penggunaan (Real-World)</th>
                         </tr>
                     </thead>
@@ -329,66 +364,73 @@
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Health Check - List Models</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/models</code></td>
-                            <td style="padding: 12px 14px;">Memeriksa kesehatan server gateway SA (Port 8643) & memastikan model <code>system-analyst</code> aktif.</td>
-                            <td style="padding: 12px 14px;">Verification check ketersediaan gateway SA sebelum eksekusi otomatis generator TSD/DDL script atau integrasi backend microservice.</td>
+                            <td style="padding: 12px 14px;">Memeriksa kesehatan server gateway SA (Port 8643) &amp; memastikan model <code>system-analyst</code> aktif.</td>
+                            <td style="padding: 12px 14px;">Verification check ketersediaan gateway SA sebelum eksekusi otomatis generator TSD/DDL script atau integrasi backend.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">2. Chat Completion (Stateless)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/chat/completions</code><br>Body: <code>messages[]</code></td>
                             <td style="padding: 12px 14px;">Mengirim prompt skenario SA tanpa simpan sesi (stateless). Respon teknis langsung dikembalikan tanpa menyimpan riwayat database.</td>
-                            <td style="padding: 12px 14px;">Pembuatan draf cepat snippet DDL Flyway tunggal, struktur RabbitMQ Event Envelope, atau validasi konvensi nama kolom SQL EKSAD.</td>
+                            <td style="padding: 12px 14px;">Pembuatan draf cepat snippet DDL Flyway tunggal, struktur RabbitMQ Event Envelope, atau validasi konvensi nama kolom SQL.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: var(--primary-light);" rowspan="4">Native Sessions (/api/sessions)</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: var(--primary-light);" rowspan="5">Native Sessions (/api/sessions)</td>
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Create New Session</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code><br>Body: <code>{"title": "..."}</code></td>
-                            <td style="padding: 12px 14px;">Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan <code>session_id</code> unik dari chat tersebut.</td>
-                            <td style="padding: 12px 14px;">Inisialisasi perancangan TSD/proyek microservice baru (contoh: <em>"svc-user-management"</em>) untuk memelihara konteks arsitektur teknis secara lengkap.</td>
+                            <td style="padding: 12px 14px;">Starter chat yang disimpan di SQLite/PostgreSQL server (auto-capture <code>session_id</code> ke Postman variable).</td>
+                            <td style="padding: 12px 14px;">Inisialisasi perancangan TSD/proyek microservice baru (contoh: <em>"svc-user-management"</em>) untuk memelihara konteks arsitektur teknis.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">2. Send Chat to Session (Stateful)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/chat</code><br>Body: <code>{"message": "..."}</code></td>
                             <td style="padding: 12px 14px;">Mengirim instruksi arsitektur teknis lanjutan secara interaktif berkesinambungan dengan konteks teknis yang dipelihara di database server.</td>
-                            <td style="padding: 12px 14px;">Perancangan TSD multi-tahap (misal: "Buat DDL PostgreSQL" ➡️ "Tambahkan audit trail & trigger" ➡️ "Buatkan RabbitMQ Event Schema & Sequence Diagram").</td>
+                            <td style="padding: 12px 14px;">Perancangan TSD multi-tahap (misal: "Buat DDL PostgreSQL" ➡️ "Tambahkan audit trail" ➡️ "Buatkan RabbitMQ Event Schema").</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History &amp; Usage</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
-                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat perancangan TSD/DDL yang pernah dihasilkan pada <code>session_id</code> bersangkutan.</td>
-                            <td style="padding: 12px 14px;">Memuat ulang dokumentasi TSD pada IDE/Portal SA, atau menguji konsistensi skema database yang dihasilkan agen selama proses perancangan.</td>
+                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat perancangan TSD &amp; akumulasi pemakaian token (<code>accumulated_usage</code>).</td>
+                            <td style="padding: 12px 14px;">Memuat ulang dokumentasi TSD pada UI SA, atau menguji konsistensi skema database yang dihasilkan agen selama proses perancangan.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-card);">
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code></td>
+                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi percakapan aktif yang tersimpan di database server.</td>
+                            <td style="padding: 12px 14px;">Menampilkan daftar sesi proyek TSD aktif di dashboard UI atau audit administrasi server.</td>
                         </tr>
                         <tr>
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Delete Session</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">5. Delete Session</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(244,63,94,0.2); color: #f43f5e; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">DELETE</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id</code></td>
-                            <td style="padding: 12px 14px;">Menghapus data sesi perancangan TSD beserta seluruh riwayatnya dari SQLite server (hermes own).</td>
-                            <td style="padding: 12px 14px;">Membersihkan sesi draft arsitektur yang dibatalkan atau menghapus memori perancangan setelah DDL/TSD berhasil di-commit ke Git repositori.</td>
+                            <td style="padding: 12px 14px;">Menghapus data sesi perancangan TSD beserta seluruh riwayatnya dari database server.</td>
+                            <td style="padding: 12px 14px;">Membersihkan sesi draft arsitektur yang dibatalkan atau menghapus memori perancangan setelah DDL/TSD berhasil di-commit ke Git.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <h3 style="color: #fff; margin-bottom: 12px;">Cara Import & Menggunakan di Postman:</h3>
+            <h3 style="color: #fff; margin-bottom: 12px;">Cara Import &amp; Menggunakan di Postman:</h3>
             <ol style="margin-left: 20px; color: var(--text-muted); font-size: 0.98rem; line-height: 1.8;">
                 <li>Download file JSON di atas atau copy isi skema JSON di bawah ini.</li>
                 <li>Buka Postman ➡️ Klik tombol <strong>Import</strong> (kiri atas).</li>
-                <li>Drag & Drop file JSON atau Paste teks skema.</li>
+                <li>Drag &amp; Drop file JSON atau Paste teks skema.</li>
                 <li>Variabel <code>{{baseUrl}}</code> (<code>http://203.145.34.37:8643</code>) dan <code>{{apiKey}}</code> sudah terkonfigurasi secara otomatis.</li>
-                <li>Jalankan request <strong>1. Health Check</strong> lalu coba <strong>Create New Session</strong> & <strong>Send Chat to Session</strong>.</li>
+                <li>Jalankan request <strong>1. Health Check</strong> lalu coba <strong>Create New Session</strong> (variabel <code>{{session_id}}</code> terisi otomatis) &amp; <strong>Send Chat to Session</strong>.</li>
             </ol>
         </div>
 
         <div class="code-header">
             <span>Hermes_System_Analyst_Postman_Collection.json</span>
-            <span>Postman v2.1.0</span>
+            <span>Postman v2.2.0 (Auto session_id Capture)</span>
         </div>
         <pre><code>{
   "info": {
-    "_postman_id": "sa-hermes-collection-v21",
+    "_postman_id": "sa-hermes-collection-v22",
     "name": "Hermes Agent - System Analyst API (Port 8643)",
     "description": "Postman Collection resmi untuk EKSAD Hermes System Analyst Gateway (Port 8643)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -396,7 +438,8 @@
   "variable": [
     { "key": "baseUrl", "value": "http://203.145.34.37:8643" },
     { "key": "apiKey", "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" },
-    { "key": "session_id", "value": "api_1785212211_12b5637c" }
+    { "key": "session_id", "value": "api_1785212211_12b5637c" },
+    { "key": "model", "value": "system-analyst" }
   ],
   "item": [
     {
@@ -409,14 +452,111 @@
     {
       "name": "Native Hermes Sessions API (/api/sessions)",
       "item": [
-        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions", "description": "Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan session_id dari chat tersebut." } },
+        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions" } },
         { "name": "2. Send Chat to Session (Stateful)", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions/{{session_id}}/chat" } },
-        { "name": "3. Get Session Messages History", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions/{{session_id}}/messages" } },
-        { "name": "4. Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/sessions/{{session_id}}" } }
+        { "name": "3. Get Session Messages History & Usage", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions/{{session_id}}/messages" } },
+        { "name": "4. Get All Active Sessions List", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions" } },
+        { "name": "5. Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/sessions/{{session_id}}" } }
       ]
     }
   ]
 }</code></pre>
+    </section>
+
+    <!-- Section 3: Detailed Request & Response JSON Code Examples -->
+    <section class="section-card">
+        <h2>Contoh Payload Request &amp; Response JSON per Endpoint</h2>
+        <p>Contoh nyata format JSON Request Payload dan Response Payload yang dikembalikan oleh Gateway System Analyst (Port 8643):</p>
+
+        <!-- Request 1 -->
+        <div class="req-card">
+            <div class="req-title">1. GET /v1/models (Health Check)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "object": "list",
+  "data": [
+    {
+      "id": "system-analyst",
+      "object": "model",
+      "created": 1785212000,
+      "owned_by": "eksad-hermes-gateway",
+      "meta": { "provider": "MiniMax", "model_name": "MiniMax-M2", "port": 8643 }
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- Request 2 -->
+        <div class="req-card">
+            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "model": "system-analyst",
+  "messages": [
+    { "role": "user", "content": "Tolong buatkan outline TSD singkat untuk microservice svc-user-management dengan Quarkus Reactive dan RabbitMQ." }
+  ],
+  "user_context": { "user_id": "USR-10293", "role": "System Analyst" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "id": "chatcmpl-98123456",
+  "object": "chat.completion",
+  "model": "system-analyst",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "### TSD Blueprint: svc-user-management (Quarkus Reactive + RabbitMQ)\n\n1. Stack Profile: Quarkus 3.30.6 · Reactive · RabbitMQ (Tier-1)\n2. Database: PostgreSQL db_user dengan 7 Kolom Audit Wajib EKSAD\n3. REST API Catalog:\n   - GET /api/v1/users (RBAC: @RolesAllowed({'ROLE_ADMIN'}))\n   - POST /api/v1/users (Audit ModuleType: EKSAD_USER.ACCOUNT.CREATE)"
+      }
+    }
+  ],
+  "usage": { "prompt_tokens": 125, "completion_tokens": 280, "total_tokens": 405 }
+}</code></pre>
+        </div>
+
+        <!-- Request 3 -->
+        <div class="req-card">
+            <div class="req-title">3. POST /api/sessions (Create New Session)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "title": "Session Jovan - TSD User Management Service Design",
+  "model": "system-analyst",
+  "user_context": { "user_id": "USR-10293", "username": "jovan_sa", "role": "System Analyst" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (201 Created)</span><code>{
+  "status": "success",
+  "session_id": "api_1785212211_12b5637c",
+  "title": "Session Jovan - TSD User Management Service Design",
+  "created_at": 1785212211
+}</code></pre>
+        </div>
+
+        <!-- Request 4 -->
+        <div class="req-card">
+            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "message": "Tolong buatkan DDL Flyway SQL untuk tabel user_account dan user_role sesuai standar EKSAD (termasuk 7 audit columns wajib & soft delete).",
+  "user_context": { "user_id": "USR-10293" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "session_id": "api_1785212211_12b5637c",
+  "message_id": "msg_998231",
+  "role": "assistant",
+  "content": "-- Flyway DDL Script: V1__init_user_schema.sql\nCREATE TABLE user_account (\n    id VARCHAR(64) PRIMARY KEY,\n    username VARCHAR(100) NOT NULL,\n    email VARCHAR(150) NOT NULL,\n    tenant_id VARCHAR(64) NOT NULL,\n    created_at BIGINT NOT NULL,\n    created_by VARCHAR(100) NOT NULL,\n    updated_at BIGINT NOT NULL,\n    updated_by VARCHAR(100) NOT NULL,\n    deleted_at BIGINT DEFAULT 0,\n    deleted_by VARCHAR(100)\n);",
+  "usage": { "prompt_tokens": 1420, "completion_tokens": 530, "total_tokens": 1950 }
+}</code></pre>
+        </div>
+
+        <!-- Request 5 -->
+        <div class="req-card">
+            <div class="req-title">5. GET /api/sessions/{session_id}/messages (Get Session Messages History)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "session_id": "api_1785212211_12b5637c",
+  "total_messages": 2,
+  "accumulated_usage": { "total_prompt_tokens": 1545, "total_completion_tokens": 810, "total_tokens": 2355 },
+  "messages": [
+    { "id": "msg_1", "role": "user", "content": "Tolong buatkan DDL Flyway SQL...", "timestamp": 1785212211 },
+    { "id": "msg_2", "role": "assistant", "content": "-- Flyway DDL Script: V1__init_user_schema.sql...", "timestamp": 1785212215 }
+  ]
+}</code></pre>
+        </div>
     </section>
 
     <footer>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes Business Analyst Profile: Documentation & Postman Test Guide</title>
+    <title>Hermes Business Analyst Profile: Documentation &amp; Postman Test Guide</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,6 +21,8 @@
             
             --accent-cyan: #06b6d4;
             --accent-indigo: #6366f1;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
             
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -151,7 +153,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 16px;
-            margin: 24px 0;
+            margin: 24px 0 32px 0;
         }
 
         .info-box {
@@ -214,6 +216,23 @@
             margin-top: 24px;
         }
 
+        .req-card {
+            background: rgba(10, 15, 28, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .req-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         pre {
             background: #060911;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -225,14 +244,30 @@
             font-size: 0.88rem;
             color: #e2e8f0;
             margin-bottom: 24px;
+            position: relative;
         }
+
+        .code-label {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: var(--font-code);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 0 10px 0 8px;
+        }
+        .lbl-req { background: rgba(16,185,129,0.2); color: var(--primary-light); border: 1px solid rgba(16,185,129,0.3); }
+        .lbl-res { background: rgba(6,182,212,0.2); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.3); }
 
         code {
             font-family: var(--font-code);
             background: rgba(255, 255, 255, 0.08);
             padding: 2px 6px;
             border-radius: 4px;
-            color: var(--accent-cyan);
+            color: var(--primary-light);
         }
 
         pre code {
@@ -255,7 +290,7 @@
 
 <div class="container">
     <nav class="top-nav">
-        <a href="../index.html" class="back-link">← Kembali ke Home Page Portal</a>
+        <a href="../index.html" class="back-link">&larr; Kembali ke Home Page Portal</a>
         <div style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-dim);">
             Business Analyst Profile (Port 8642)
         </div>
@@ -263,7 +298,7 @@
 
     <header>
         <div class="badge-profile">PROFILE: BUSINESS ANALYST</div>
-        <h1>Hermes Business Analyst Integration & Postman Guide</h1>
+        <h1>Hermes Business Analyst Integration &amp; Postman Guide</h1>
         <p class="subtitle">Dokumentasi integrasi khusus profile <strong>business-analyst</strong> pada Port 8642 mencakup panduan pengujian Postman Collection lengkap untuk penyusunan BRD, FSD, dan User Story.</p>
     </header>
 
@@ -289,27 +324,27 @@
 
     <!-- Section 1: Scope & Capability -->
     <section class="section-card">
-        <h2>Cakupan & Peran Agen Business Analyst</h2>
+        <h2>Cakupan &amp; Peran Agen Business Analyst</h2>
         <p>Profile <code>business-analyst</code> bertugas menerjemahkan kebutuhan bisnis pengguna menjadi spesifikasi fungsional yang terstruktur:</p>
         <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.98rem;">
-            <li><strong>Menulis & Review BRD / FSD</strong> — Menyusun bab kebutuhan bisnis dan analisis fungsional.</li>
-            <li><strong>User Story & Acceptance Criteria</strong> — Format <em>"As a [user], I want [feature] so that [benefit]"</em>.</li>
-            <li><strong>Business Process Flow</strong> — Menyusun diagram alur bisnis & matriks persetujuan (Approval Matrix).</li>
+            <li><strong>Menulis &amp; Review BRD / FSD</strong> — Menyusun bab kebutuhan bisnis dan analisis fungsional.</li>
+            <li><strong>User Story &amp; Acceptance Criteria</strong> — Format <em>"As a [user], I want [feature] so that [benefit]"</em> dan Given-When-Then.</li>
+            <li><strong>Business Process Flow</strong> — Menyusun diagram alur bisnis &amp; matriks persetujuan (Approval Matrix).</li>
             <li><strong>Use Case Catalog</strong> — Menyusun skenario use case utama dan skenario alternatif.</li>
         </ul>
     </section>
 
     <!-- Section 2: Postman Collection Test -->
     <section class="section-card">
-        <h2>Postman Collection & Test Guide</h2>
-        <p>File koleksi Postman v2.1 resmi untuk profile Business Analyst telah disiapkan di folder ini:</p>
+        <h2>Postman Collection &amp; Test Guide</h2>
+        <p>File koleksi Postman v2.2 resmi untuk profile Business Analyst telah disiapkan di folder ini:</p>
 
         <a href="./Hermes_Business_Analyst_Postman_Collection.json" download class="download-btn">
             📥 Download Hermes_Business_Analyst_Postman_Collection.json
         </a>
 
         <div style="margin-top: 32px;">
-            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, & Skenario Penggunaannya:</h3>
+            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, &amp; Skenario Penggunaannya:</h3>
             <div style="overflow-x: auto; margin-bottom: 24px;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; border: 1px solid var(--border-card); border-radius: 8px;">
                     <thead>
@@ -317,8 +352,8 @@
                             <th style="padding: 12px 14px; text-align: left; min-width: 140px;">Folder</th>
                             <th style="padding: 12px 14px; text-align: left; min-width: 170px;">Nama Request</th>
                             <th style="padding: 12px 14px; text-align: center; width: 80px;">Method</th>
-                            <th style="padding: 12px 14px; text-align: left; min-width: 180px;">Endpoint & Parameter</th>
-                            <th style="padding: 12px 14px; text-align: left; min-width: 220px;">Fungsi & Kegunaan Utama</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 180px;">Endpoint &amp; Parameter</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 220px;">Fungsi &amp; Kegunaan Utama</th>
                             <th style="padding: 12px 14px; text-align: left; min-width: 240px;">Skenario Penggunaan (Real-World)</th>
                         </tr>
                     </thead>
@@ -328,22 +363,22 @@
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Health Check - List Models</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/models</code></td>
-                            <td style="padding: 12px 14px;">Memeriksa kesehatan server gateway BA (Port 8642) & memastikan model <code>business-analyst</code> aktif.</td>
-                            <td style="padding: 12px 14px;">Smoke test konektivitas server gateway sebelum pengujian otomatis di pipeline CI/CD atau sebelum integrasi API ke frontend.</td>
+                            <td style="padding: 12px 14px;">Memeriksa kesehatan server gateway BA (Port 8642) &amp; memastikan model <code>business-analyst</code> aktif.</td>
+                            <td style="padding: 12px 14px;">Smoke test konektivitas server gateway sebelum pengujian otomatis atau integrasi API ke frontend.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">2. Chat Completion (Stateless)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/chat/completions</code><br>Body: <code>messages[]</code></td>
                             <td style="padding: 12px 14px;">Mengirim prompt skenario BA tanpa simpan sesi (stateless). Respon langsung dikembalikan tanpa riwayat database.</td>
-                            <td style="padding: 12px 14px;">Tanya-jawab instan seputar standar FSD/BRD EKSAD, draf singkat 1 User Story tunggal, atau verifikasi istilah bisnis cepat.</td>
+                            <td style="padding: 12px 14px;">Tanya-jawab instan seputar standar FSD/BRD EKSAD, draf singkat 1 User Story tunggal, atau verifikasi istilah bisnis.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: var(--primary-light);" rowspan="4">Native Sessions (/api/sessions)</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: var(--primary-light);" rowspan="5">Native Sessions (/api/sessions)</td>
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Create New Session</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code><br>Body: <code>{"title": "..."}</code></td>
-                            <td style="padding: 12px 14px;">Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan <code>session_id</code> unik dari chat tersebut.</td>
+                            <td style="padding: 12px 14px;">Starter chat yang disimpan di SQLite/PostgreSQL server (auto-capture <code>session_id</code> ke Postman variable).</td>
                             <td style="padding: 12px 14px;">Inisialisasi percakapan perancangan BRD/FSD proyek baru (contoh: <em>"Procurement Approval Matrix"</em>) agar memiliki konteks yang bertahan lama.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
@@ -351,43 +386,50 @@
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/chat</code><br>Body: <code>{"message": "..."}</code></td>
                             <td style="padding: 12px 14px;">Mengirim instruksi analisis lanjutan secara interaktif berkesinambungan dengan konteks percakapan yang terus diingat agen BA.</td>
-                            <td style="padding: 12px 14px;">Penyusunan BRD multi-tahap (misal: "Buat daftar User Story" ➡️ "Tambahkan Acceptance Criteria tiap story" ➡️ "Susun Approval Matrix").</td>
+                            <td style="padding: 12px 14px;">Penyusunan BRD multi-tahap (misal: "Buat daftar User Story" ➡️ "Tambahkan Acceptance Criteria" ➡️ "Susun Approval Matrix").</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History &amp; Usage</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
-                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis yang pernah dihasilkan pada <code>session_id</code> tersebut.</td>
-                            <td style="padding: 12px 14px;">Memuat ulang riwayat percakapan BRD pada UI portal pengguna atau melakukan audit trail terhadap dokumen kebutuhan bisnis yang dibuat.</td>
+                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis &amp; akumulasi pemakaian token (<code>accumulated_usage</code>).</td>
+                            <td style="padding: 12px 14px;">Memuat ulang riwayat percakapan BRD pada UI portal pengguna atau melakukan audit trail terhadap dokumen kebutuhan bisnis.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-card);">
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code></td>
+                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi analisis kebutuhan bisnis yang tersimpan di database server.</td>
+                            <td style="padding: 12px 14px;">Menampilkan daftar sesi BRD/FSD di dashboard UI portal.</td>
                         </tr>
                         <tr>
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Delete Session</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">5. Delete Session</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(244,63,94,0.2); color: #f43f5e; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">DELETE</span></td>
                             <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id</code></td>
-                            <td style="padding: 12px 14px;">Menghapus data sesi beserta seluruh riwayat percakapannya dari database SQLite server (hermes own).</td>
-                            <td style="padding: 12px 14px;">Membersihkan sesi analisis yang sudah selesai di-export ke BRD/FSD final, atau menghapus percakapan uji coba yang tidak lagi digunakan.</td>
+                            <td style="padding: 12px 14px;">Menghapus data sesi beserta seluruh riwayat percakapannya dari database server.</td>
+                            <td style="padding: 12px 14px;">Membersihkan sesi analisis yang sudah selesai di-export ke BRD/FSD final, atau menghapus percakapan uji coba.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <h3 style="color: #fff; margin-bottom: 12px;">Cara Import & Menggunakan di Postman:</h3>
+            <h3 style="color: #fff; margin-bottom: 12px;">Cara Import &amp; Menggunakan di Postman:</h3>
             <ol style="margin-left: 20px; color: var(--text-muted); font-size: 0.98rem; line-height: 1.8;">
                 <li>Download file JSON di atas atau copy isi skema JSON di bawah ini.</li>
                 <li>Buka Postman ➡️ Klik tombol <strong>Import</strong> (kiri atas).</li>
-                <li>Drag & Drop file JSON atau Paste teks skema.</li>
+                <li>Drag &amp; Drop file JSON atau Paste teks skema.</li>
                 <li>Variabel <code>{{baseUrl}}</code> (<code>http://203.145.34.37:8642</code>) dan <code>{{apiKey}}</code> sudah terkonfigurasi secara otomatis.</li>
-                <li>Jalankan request <strong>1. Health Check</strong> lalu coba <strong>Create New Session</strong> & <strong>Send Chat to Session</strong>.</li>
+                <li>Jalankan request <strong>1. Health Check</strong> lalu coba <strong>Create New Session</strong> (variabel <code>{{session_id}}</code> terisi otomatis) &amp; <strong>Send Chat to Session</strong>.</li>
             </ol>
         </div>
 
         <div class="code-header">
             <span>Hermes_Business_Analyst_Postman_Collection.json</span>
-            <span>Postman v2.1.0</span>
+            <span>Postman v2.2.0 (Auto session_id Capture)</span>
         </div>
         <pre><code>{
   "info": {
-    "_postman_id": "ba-hermes-collection-v21",
+    "_postman_id": "ba-hermes-collection-v22",
     "name": "Hermes Agent - Business Analyst API (Port 8642)",
     "description": "Postman Collection resmi untuk EKSAD Hermes Business Analyst Gateway (Port 8642)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -395,7 +437,8 @@
   "variable": [
     { "key": "baseUrl", "value": "http://203.145.34.37:8642" },
     { "key": "apiKey", "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" },
-    { "key": "session_id", "value": "api_ba_session_demo" }
+    { "key": "session_id", "value": "api_ba_1785212211_99aa" },
+    { "key": "model", "value": "business-analyst" }
   ],
   "item": [
     {
@@ -408,14 +451,111 @@
     {
       "name": "Native Hermes Sessions API (/api/sessions)",
       "item": [
-        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions", "description": "Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan session_id dari chat tersebut." } },
+        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions" } },
         { "name": "2. Send Chat to Session (Stateful)", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions/{{session_id}}/chat" } },
-        { "name": "3. Get Session Messages History", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions/{{session_id}}/messages" } },
-        { "name": "4. Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/sessions/{{session_id}}" } }
+        { "name": "3. Get Session Messages History & Usage", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions/{{session_id}}/messages" } },
+        { "name": "4. Get All Active Sessions List", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions" } },
+        { "name": "5. Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/sessions/{{session_id}}" } }
       ]
     }
   ]
 }</code></pre>
+    </section>
+
+    <!-- Section 3: Detailed Request & Response JSON Code Examples -->
+    <section class="section-card">
+        <h2>Contoh Payload Request &amp; Response JSON per Endpoint</h2>
+        <p>Contoh nyata format JSON Request Payload dan Response Payload yang dikembalikan oleh Gateway Business Analyst (Port 8642):</p>
+
+        <!-- Request 1 -->
+        <div class="req-card">
+            <div class="req-title">1. GET /v1/models (Health Check)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "object": "list",
+  "data": [
+    {
+      "id": "business-analyst",
+      "object": "model",
+      "created": 1785212000,
+      "owned_by": "eksad-hermes-gateway",
+      "meta": { "provider": "Anthropic", "model_name": "claude-sonnet-4", "port": 8642 }
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- Request 2 -->
+        <div class="req-card">
+            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "model": "business-analyst",
+  "messages": [
+    { "role": "user", "content": "Halo, sebutkan 3 peran utama Business Analyst di EKSAD dalam menyusun BRD & FSD!" }
+  ],
+  "user_context": { "user_id": "USR-88201", "role": "Business Analyst" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "id": "chatcmpl-ba-991234",
+  "object": "chat.completion",
+  "model": "business-analyst",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Tentu! Tiga peran utama Business Analyst di EKSAD meliputi:\n1. Ekstraksi kebutuhan bisnis dari stakeholder & BA Walkthrough.\n2. Penyusunan User Stories & Acceptance Criteria (format Given-When-Then).\n3. Penguraian alur bisnis & pembatasan NFR (Non-Functional Requirements)."
+      }
+    }
+  ],
+  "usage": { "prompt_tokens": 95, "completion_tokens": 160, "total_tokens": 255 }
+}</code></pre>
+        </div>
+
+        <!-- Request 3 -->
+        <div class="req-card">
+            <div class="req-title">3. POST /api/sessions (Create New Session)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "title": "Session BA - Procurement Workflow BRD Analysis",
+  "model": "business-analyst",
+  "user_context": { "user_id": "USR-88201", "username": "sarah_ba", "role": "Business Analyst" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (201 Created)</span><code>{
+  "status": "success",
+  "session_id": "api_ba_1785212211_99aa",
+  "title": "Session BA - Procurement Workflow BRD Analysis",
+  "created_at": 1785212211
+}</code></pre>
+        </div>
+
+        <!-- Request 4 -->
+        <div class="req-card">
+            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "message": "Tolong buatkan User Story dan Acceptance Criteria (format Given-When-Then) untuk modul Approval Matrix pada E-Procurement.",
+  "user_context": { "user_id": "USR-88201" }
+}</code></pre>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "session_id": "api_ba_1785212211_99aa",
+  "message_id": "msg_ba_00192",
+  "role": "assistant",
+  "content": "### User Story: E-Procurement Approval Matrix\n\n**As a** Finance Manager,\n**I want to** approve procurement requests exceeding 100M IDR,\n**So that** high-value purchases comply with corporate governance.\n\n### Acceptance Criteria:\n- **Given** a procurement request worth 150M IDR,\n- **When** the Finance Manager submits the approval form,\n- **Then** the status changes to APPROVED and a notification event is sent to RabbitMQ.",
+  "usage": { "prompt_tokens": 1120, "completion_tokens": 420, "total_tokens": 1540 }
+}</code></pre>
+        </div>
+
+        <!-- Request 5 -->
+        <div class="req-card">
+            <div class="req-title">5. GET /api/sessions/{session_id}/messages (Get Session Messages History)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "session_id": "api_ba_1785212211_99aa",
+  "total_messages": 2,
+  "accumulated_usage": { "total_prompt_tokens": 1215, "total_completion_tokens": 580, "total_tokens": 1795 },
+  "messages": [
+    { "id": "msg_1", "role": "user", "content": "Tolong buatkan User Story...", "timestamp": 1785212211 },
+    { "id": "msg_2", "role": "assistant", "content": "### User Story: E-Procurement Approval Matrix...", "timestamp": 1785212215 }
+  ]
+}</code></pre>
+        </div>
     </section>
 
     <footer>

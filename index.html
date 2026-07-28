@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EKSAD Hermes Agent Hub & Documentation Center</title>
+    <title>EKSAD Hermes Agent Hub &amp; Documentation Center</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -56,7 +56,6 @@
             padding: 48px 24px 80px 24px;
         }
 
-        /* Navbar / Header Navigation */
         .navbar {
             display: flex;
             align-items: center;
@@ -90,7 +89,6 @@
             font-size: 1.25rem;
             font-weight: 700;
             color: #fff;
-            letter-spacing: -0.01em;
         }
 
         .logo-badge {
@@ -104,12 +102,10 @@
             text-transform: uppercase;
         }
 
-        .hero {
-            margin-bottom: 56px;
-        }
+        .hero { margin-bottom: 40px; }
 
         .hero-title {
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 800;
             line-height: 1.15;
             letter-spacing: -0.03em;
@@ -117,20 +113,36 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 16px;
-            max-width: 900px;
         }
 
         .hero-description {
             font-size: 1.15rem;
             color: var(--text-muted);
-            max-width: 820px;
-            margin-bottom: 32px;
+            max-width: 850px;
+            margin-bottom: 24px;
         }
 
-        /* Server Status Quick Strip */
+        /* Executive Summary Box */
+        .exec-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-highlight);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 48px;
+        }
+
+        .exec-box h3 {
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .status-strip {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 16px;
             margin-bottom: 48px;
         }
@@ -174,28 +186,9 @@
             font-family: var(--font-code);
         }
 
-        /* Documentation Cards Grid */
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
         .doc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 24px;
             margin-bottom: 56px;
         }
@@ -219,9 +212,7 @@
         .doc-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
             opacity: 0;
@@ -235,13 +226,7 @@
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 30px var(--primary-glow);
         }
 
-        .doc-card:hover::before {
-            opacity: 1;
-        }
-
-        .doc-header {
-            margin-bottom: 20px;
-        }
+        .doc-card:hover::before { opacity: 1; }
 
         .doc-tag {
             display: inline-block;
@@ -250,7 +235,6 @@
             padding: 4px 10px;
             border-radius: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
             margin-bottom: 12px;
         }
 
@@ -259,251 +243,120 @@
         .tag-emerald { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
         .tag-amber { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
 
-        .doc-card h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
+        .doc-card h3 { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .doc-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+        .doc-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; color: var(--primary-light); }
 
-        .doc-card p {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .doc-footer {
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--primary-light);
-        }
-
-        .arrow-icon {
-            transition: transform 0.2s ease;
-        }
-
-        .doc-card:hover .arrow-icon {
-            transform: translateX(4px);
-        }
-
-        /* Profile Cards Section */
-        .profiles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 24px;
-            margin-bottom: 56px;
-        }
-
-        .profile-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 16px;
-            padding: 28px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-card);
-        }
-
-        .profile-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-            font-family: var(--font-code);
-        }
-
-        .profile-port {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-family: var(--font-code);
-            color: var(--accent-cyan);
-        }
-
-        .profile-list {
-            list-style: none;
-            font-size: 0.92rem;
-            color: var(--text-muted);
-        }
-
-        .profile-list li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 8px;
-        }
-
-        .profile-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--accent-emerald);
-            font-weight: bold;
-        }
-
-        footer {
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-card);
-            padding-top: 32px;
-        }
+        footer { text-align: center; padding-top: 40px; border-top: 1px solid var(--border-card); color: var(--text-dim); font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Navbar Header -->
     <nav class="navbar">
         <div class="logo-area">
             <div class="logo-icon">H</div>
-            <span class="logo-text">EKSAD Hermes Hub</span>
-            <span class="logo-badge">Enterprise Gateway v2.1</span>
+            <div class="logo-text">EKSAD Hermes Agent Hub</div>
         </div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-code);">
-            Host: 203.145.34.37
-        </div>
+        <span class="logo-badge">Gateway v2.3 Online</span>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1 class="hero-title">Dokumentasi Arsitektur & Integration Knowledge Base</h1>
-        <p class="hero-description">Pusat dokumentasi resmi integrasi EKSAD Hermes Agentic Gateway. Tempat rujukan teknis presisi untuk System Analyst, Solution Architect, dan Software Developer.</p>
-    </section>
+    <header class="hero">
+        <h1 class="hero-title">Pusat Dokumentasi &amp; Portal Integrasi Hermes Agent</h1>
+        <p class="hero-description">
+            Selamat datang di Portal Dokumentasi EKSAD Hermes. Tempat berkumpulnya panduan arsitektur, spesifikasi API Gateway, dan Postman Collection untuk <strong>Audience, Leader, dan Developer</strong>.
+        </p>
 
-    <!-- Status Strip -->
+        <!-- Executive Overview -->
+        <div class="exec-box">
+            <h3>📌 Apa itu Hermes Agent? (Executive Summary)</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                <strong>Hermes Agent</strong> adalah Co-Pilot AI cerdas yang membantu mendampingi Business Analyst (BA) dan System Analyst (SA) di PT EKSAD. Agent ini bertugas mempercepat perancangan dokumen kebutuhan bisnis (BRD/FSD), spesifikasi arsitektur teknis (TSD), skrip Flyway DDL PostgreSQL, API Contracts, hingga pemetaan keamanan STRIDE secara otomatis dan patuh pada standar EKSAD.
+            </p>
+        </div>
+    </header>
+
+    <!-- Quick Status -->
     <div class="status-strip">
         <div class="status-card">
             <div class="status-icon">🖥️</div>
             <div class="status-info">
-                <div class="label">Server Host</div>
+                <div class="label">Server Gateway</div>
                 <div class="value">203.145.34.37</div>
             </div>
         </div>
         <div class="status-card">
-            <div class="status-icon">⚡</div>
+            <div class="status-icon">🔌</div>
             <div class="status-info">
-                <div class="label">System Analyst Profile</div>
-                <div class="value">Port 8643 (MiniMax-M2)</div>
+                <div class="label">SA Profile (Port 8643)</div>
+                <div class="value" style="color:#06b6d4">MiniMax-M2</div>
             </div>
         </div>
         <div class="status-card">
-            <div class="status-icon">💼</div>
+            <div class="status-icon">🔌</div>
             <div class="status-info">
-                <div class="label">Business Analyst Profile</div>
-                <div class="value">Port 8642 (Sonnet-4)</div>
-            </div>
-        </div>
-        <div class="status-card">
-            <div class="status-icon">💾</div>
-            <div class="status-info">
-                <div class="label">Storage Engine</div>
-                <div class="value">SQLite 3 (Persistent)</div>
+                <div class="label">BA Profile (Port 8642)</div>
+                <div class="value" style="color:#818cf8">Claude Sonnet 4</div>
             </div>
         </div>
     </div>
 
-    <!-- Main Documentation Modules -->
-    <h2 class="section-title">Modul Dokumentasi & Postman Test Guide</h2>
+    <!-- Documentation Grid -->
+    <h2 class="section-title">Modul Dokumentasi &amp; Panduan Integrasi</h2>
     <div class="doc-grid">
-
-        <!-- CARD 1: System Analyst Profile & Postman -->
-        <a href="./system-analyst/index.html" class="doc-card">
-            <div class="doc-header">
-                <span class="doc-tag tag-indigo">Profile: System Analyst</span>
-                <h3>System Analyst API & Postman Guide</h3>
-                <p>Panduan pengujian Postman Collection dan integrasi Port 8643 untuk penulisan TSD, DDL SQL Flyway, RabbitMQ Schemas, dan API Contracts.</p>
-            </div>
-            <div class="doc-footer">
-                <span>Buka Dokumen System Analyst</span>
-                <span class="arrow-icon">→</span>
-            </div>
-        </a>
-
-        <!-- CARD 2: Business Analyst Profile & Postman -->
-        <a href="./business-analyst/index.html" class="doc-card">
-            <div class="doc-header">
-                <span class="doc-tag tag-emerald">Profile: Business Analyst</span>
-                <h3>Business Analyst API & Postman Guide</h3>
-                <p>Panduan pengujian Postman Collection dan integrasi Port 8642 untuk penyusunan BRD, FSD, User Stories, dan Acceptance Criteria.</p>
-            </div>
-            <div class="doc-footer">
-                <span>Buka Dokumen Business Analyst</span>
-                <span class="arrow-icon">→</span>
-            </div>
-        </a>
-
-        <!-- CARD 3: Hermes Overview & API Reference -->
-        <a href="./knowledge/hermes-agent-overview.html" class="doc-card">
-            <div class="doc-header">
-                <span class="doc-tag tag-cyan">Panduan Pengenalan & API</span>
-                <h3>Hermes Agent Overview & API Manual</h3>
-                <p>Penjelasan lengkap mengenai konsep Hermes Agent Gateway, alur komunikasi (Stateless vs Stateful), katalog endpoint API, dan contoh payload request/response JSON.</p>
-            </div>
-            <div class="doc-footer">
-                <span>Buka Panduan Overview</span>
-                <span class="arrow-icon">→</span>
-            </div>
-        </a>
         
-        <!-- CARD 4: Gateway Integration Spec -->
-        <a href="./knowledge/hermes-gateway-integration.html" class="doc-card">
-            <div class="doc-header">
-                <span class="doc-tag tag-amber">Spesifikasi Arsitektur</span>
-                <h3>Hermes Gateway Technical Integration</h3>
-                <p>Dokumentasi presisi mengenai Session Management (/api/sessions vs /v1/chat/completions), Token Accounting, serta Storage & Memory Retention policy.</p>
+        <a href="knowledge/hermes-gateway-integration.html" class="doc-card">
+            <div>
+                <span class="doc-tag tag-cyan">Gateway Spec &amp; FAQ</span>
+                <h3>Arsitektur &amp; Integrasi Gateway</h3>
+                <p>Panduan lengkap integrasi API: Stateful Sessions vs Stateless Completion, Token Accounting, Storage Retention, serta FAQ interaktif untuk Leader &amp; Dev.</p>
             </div>
             <div class="doc-footer">
-                <span>Buka Spesifikasi Arsitektur</span>
-                <span class="arrow-icon">→</span>
+                <span>Buka Panduan Gateway</span>
+                <span class="arrow-icon">&rarr;</span>
+            </div>
+        </a>
+
+        <a href="knowledge/hermes-agent-overview.html" class="doc-card">
+            <div>
+                <span class="doc-tag tag-indigo">Konsep &amp; Architecture</span>
+                <h3>Overview Arsitektur Hermes</h3>
+                <p>Penjelasan intuitif konsep AI Orchestrator, SOUL System Instructions, MCP Tools, serta alur kolaborasi BA &rarr; SA &rarr; Developer.</p>
+            </div>
+            <div class="doc-footer">
+                <span>Buka Overview Konsep</span>
+                <span class="arrow-icon">&rarr;</span>
+            </div>
+        </a>
+
+        <a href="system-analyst/index.html" class="doc-card">
+            <div>
+                <span class="doc-tag tag-emerald">System Analyst Profile</span>
+                <h3>System Analyst Portal &amp; Postman</h3>
+                <p>Dokumentasi profil SA, panduan impor Postman collection `system-analyst` (Port 8643), serta cetak biru perancangan TSD &amp; Flyway DDL.</p>
+            </div>
+            <div class="doc-footer">
+                <span>Buka Portal SA</span>
+                <span class="arrow-icon">&rarr;</span>
+            </div>
+        </a>
+
+        <a href="business-analyst/index.html" class="doc-card">
+            <div>
+                <span class="doc-tag tag-amber">Business Analyst Profile</span>
+                <h3>Business Analyst Portal &amp; Postman</h3>
+                <p>Dokumentasi profil BA, panduan impor Postman collection `business-analyst` (Port 8642), serta cetak biru perancangan BRD &amp; User Stories.</p>
+            </div>
+            <div class="doc-footer">
+                <span>Buka Portal BA</span>
+                <span class="arrow-icon">&rarr;</span>
             </div>
         </a>
 
     </div>
 
-    <!-- Active Profiles Summary -->
-    <h2 class="section-title">Profil Hermes Agentic Active</h2>
-    <div class="profiles-grid">
-        <div class="profile-card">
-            <div class="profile-header">
-                <span class="profile-name">system-analyst</span>
-                <span class="profile-port">Port 8643</span>
-            </div>
-            <ul class="profile-list">
-                <li>Didesain khusus untuk penulisan & review Technical Specification Document (TSD).</li>
-                <li>Mendukung pembuatan skema data model, DDL SQL Flyway, dan Diagram Urutan (Sequence).</li>
-                <li>Mendukung Native Session History untuk persistent chat per user / tiket.</li>
-            </ul>
-        </div>
-
-        <div class="profile-card">
-            <div class="profile-header">
-                <span class="profile-name">business-analyst</span>
-                <span class="profile-port">Port 8642</span>
-            </div>
-            <ul class="profile-list">
-                <li>Didesain khusus untuk analisa kebutuhan bisnis (BRD / FSD).</li>
-                <li>Membantu menyusun kriteria penerimaan (Acceptance Criteria) dan Use Case.</li>
-                <li>Terintegrasi langsung dengan gateway internal office.</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
-        PT EKSAD (Eksad Group) &copy; 2026 — Hermes Agentic Knowledge & Documentation Portal
+        <p>&copy; 2026 PT EKSAD Solusi Digital — EKSAD Agentic Knowledge Framework</p>
     </footer>
 </div>
 

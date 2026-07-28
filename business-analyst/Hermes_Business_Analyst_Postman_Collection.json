@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "ba-hermes-collection-v21",
+    "_postman_id": "ba-hermes-collection-v22",
     "name": "Hermes Agent - Business Analyst API (Port 8642)",
-    "description": "Postman Collection resmi untuk EKSAD Hermes Business Analyst Gateway (Port 8642) mendukung OpenAI API (/v1) dan Native Hermes Sessions API (/api/sessions) untuk persistent chat history.",
+    "description": "Postman Collection resmi EKSAD Hermes Business Analyst Gateway (Port 8642). Mendukung OpenAI API (/v1) dan Native Hermes Sessions API (/api/sessions) dengan auto-capture session_id, user_context, persistent SQLite storage, serta token accounting.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -16,13 +16,19 @@
       "key": "apiKey",
       "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9",
       "type": "string",
-      "description": "API_SERVER_KEY (Bearer Token)"
+      "description": "API_SERVER_KEY (Bearer Token Auth)"
     },
     {
       "key": "session_id",
-      "value": "api_ba_session_demo",
+      "value": "api_ba_1785212211_99aa",
       "type": "string",
-      "description": "Session ID unik untuk chat history"
+      "description": "Session ID unik (otomatis ter-update saat eksekusi Create Session)"
+    },
+    {
+      "key": "model",
+      "value": "business-analyst",
+      "type": "string",
+      "description": "Model Profile aktif untuk Business Analyst (Claude Sonnet 4)"
     }
   ],
   "auth": {
@@ -49,7 +55,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["v1", "models"]
             },
-            "description": "Cek status kesehatan server dan daftar model aktif untuk profile Business Analyst."
+            "description": "Cek status kesehatan server gateway BA (Port 8642) dan verifikasi model profile business-analyst aktif."
           }
         },
         {
@@ -64,14 +70,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"model\": \"business-analyst\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Halo, sebutkan 3 peran utama Business Analyst di EKSAD dalam menyusun FSD!\"\n    }\n  ]\n}"
+              "raw": "{\n  \"model\": \"{{model}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Halo, sebutkan 3 peran utama Business Analyst di EKSAD dalam menyusun BRD & FSD!\"\n    }\n  ],\n  \"user_context\": {\n    \"user_id\": \"USR-88201\",\n    \"role\": \"Business Analyst\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/chat/completions",
               "host": ["{{baseUrl}}"],
               "path": ["v1", "chat", "completions"]
             },
-            "description": "Mengirimkan pesan obrolan sekali respon (stateless) tanpa menyimpan riwayat di database server."
+            "description": "Mengirimkan instruksi obrolan sekali respon (stateless) tanpa menyimpan riwayat di database server."
           }
         }
       ]
@@ -81,6 +87,23 @@
       "item": [
         {
           "name": "1. Create New Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.session_id) {",
+                  "        pm.collectionVariables.set('session_id', jsonData.session_id);",
+                  "        console.log('Auto-set session_id to: ' + jsonData.session_id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -91,14 +114,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Session BA - Procurement Workflow BRD\"\n}"
+              "raw": "{\n  \"title\": \"Session BA - Procurement Workflow BRD Analysis\",\n  \"model\": \"{{model}}\",\n  \"user_context\": {\n    \"user_id\": \"USR-88201\",\n    \"username\": \"sarah_ba\",\n    \"role\": \"Business Analyst\",\n    \"department\": \"Business Requirement\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/sessions",
               "host": ["{{baseUrl}}"],
               "path": ["api", "sessions"]
             },
-            "description": "Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan session_id dari chat tersebut."
+            "description": "Inisialisasi sesi analisis kebutuhan bisnis (BRD/FSD) baru di SQLite server Hermes. Mengembalikan session_id unik dan secara otomatis menyimpan session_id tersebut ke variabel collection."
           }
         },
         {
@@ -113,18 +136,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"Tolong buatkan User Story dan Acceptance Criteria untuk modul Approval Matrix pada E-Procurement.\"\n}"
+              "raw": "{\n  \"message\": \"Tolong buatkan User Story dan Acceptance Criteria (format Given-When-Then) untuk modul Approval Matrix pada E-Procurement.\",\n  \"user_context\": {\n    \"user_id\": \"USR-88201\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
               "host": ["{{baseUrl}}"],
               "path": ["api", "sessions", "{{session_id}}", "chat"]
             },
-            "description": "Mengirim obrolan lanjutan ke sesi tertentu. Percakapan tersimpan otomatis di database server."
+            "description": "Mengirim obrolan lanjutan ke sesi aktif. Server Hermes otomatis memuat histori obrolan sebelumnya dari database dan menambahkan pesan baru ke histori."
           }
         },
         {
-          "name": "3. Get Session Messages History",
+          "name": "3. Get Session Messages History & Usage",
           "request": {
             "method": "GET",
             "header": [],
@@ -133,11 +156,24 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "sessions", "{{session_id}}", "messages"]
             },
-            "description": "Mengambil seluruh daftar riwayat obrolan (Chat History) yang tersimpan pada session_id bersangkutan."
+            "description": "Mengambil seluruh daftar riwayat obrolan (Chat History) dan akumulasi pemakaian token (accumulated_usage) yang tersimpan pada session_id bersangkutan."
           }
         },
         {
-          "name": "4. Delete Session",
+          "name": "4. Get All Active Sessions List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions"]
+            },
+            "description": "Memanggil daftar seluruh sesi percakapan yang tersimpan di server database Hermes."
+          }
+        },
+        {
+          "name": "5. Delete Session",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -146,7 +182,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "sessions", "{{session_id}}"]
             },
-            "description": "Menghapus sesi tertentu dari database server."
+            "description": "Menghapus sesi analisis BRD/FSD tertentu dari database server."
           }
         }
       ]

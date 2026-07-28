@@ -309,56 +309,63 @@
         </a>
 
         <div style="margin-top: 32px;">
-            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection & Fungsinya:</h3>
+            <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, & Skenario Penggunaannya:</h3>
             <div style="overflow-x: auto; margin-bottom: 24px;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; border: 1px solid var(--border-card); border-radius: 8px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; border: 1px solid var(--border-card); border-radius: 8px;">
                     <thead>
                         <tr style="background: rgba(30, 41, 59, 0.8); color: #fff;">
-                            <th style="padding: 10px 14px; text-align: left;">Folder</th>
-                            <th style="padding: 10px 14px; text-align: left;">Nama Request</th>
-                            <th style="padding: 10px 14px; text-align: center;">Method</th>
-                            <th style="padding: 10px 14px; text-align: left;">Endpoint & Parameter</th>
-                            <th style="padding: 10px 14px; text-align: left;">Fungsi & Kegunaan Utama</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 140px;">Folder</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 170px;">Nama Request</th>
+                            <th style="padding: 12px 14px; text-align: center; width: 80px;">Method</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 180px;">Endpoint & Parameter</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 220px;">Fungsi & Kegunaan Utama</th>
+                            <th style="padding: 12px 14px; text-align: left; min-width: 240px;">Skenario Penggunaan (Real-World)</th>
                         </tr>
                     </thead>
                     <tbody style="color: var(--text-muted);">
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 10px 14px; font-weight: 600; color: var(--accent-cyan);" rowspan="2">OpenAI Compatible (/v1)</td>
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">1. Health Check - List Models</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/models</code></td>
-                            <td style="padding: 10px 14px;">Memeriksa kesehatan server gateway BA (Port 8642) & memastikan model <code>business-analyst</code> aktif.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: var(--accent-cyan);" rowspan="2">OpenAI Compatible (/v1)</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Health Check - List Models</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/models</code></td>
+                            <td style="padding: 12px 14px;">Memeriksa kesehatan server gateway BA (Port 8642) & memastikan model <code>business-analyst</code> aktif.</td>
+                            <td style="padding: 12px 14px;">Smoke test konektivitas server gateway sebelum pengujian otomatis di pipeline CI/CD atau sebelum integrasi API ke frontend.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">2. Chat Completion (Stateless)</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/chat/completions</code><br>Body: <code>messages[]</code></td>
-                            <td style="padding: 10px 14px;">Mengirim prompt skenario BA tanpa simpan sesi. Cocok untuk tanya-jawab cepat peran BA atau draf singkat User Story.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">2. Chat Completion (Stateless)</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/v1/chat/completions</code><br>Body: <code>messages[]</code></td>
+                            <td style="padding: 12px 14px;">Mengirim prompt skenario BA tanpa simpan sesi (stateless). Respon langsung dikembalikan tanpa riwayat database.</td>
+                            <td style="padding: 12px 14px;">Tanya-jawab instan seputar standar FSD/BRD EKSAD, draf singkat 1 User Story tunggal, atau verifikasi istilah bisnis cepat.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 10px 14px; font-weight: 600; color: var(--primary-light);" rowspan="4">Native Sessions (/api/sessions)</td>
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">1. Create New Session</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code><br>Body: <code>{"title": "..."}</code></td>
-                            <td style="padding: 10px 14px;">Membuat sesi analisis bisnis/BRD/FSD baru di SQLite server. Mengembalikan <code>session_id</code> unik.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: var(--primary-light);" rowspan="4">Native Sessions (/api/sessions)</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">1. Create New Session</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code><br>Body: <code>{"title": "..."}</code></td>
+                            <td style="padding: 12px 14px;">Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan <code>session_id</code> unik dari chat tersebut.</td>
+                            <td style="padding: 12px 14px;">Inisialisasi percakapan perancangan BRD/FSD proyek baru (contoh: <em>"Procurement Approval Matrix"</em>) agar memiliki konteks yang bertahan lama.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">2. Send Chat to Session (Stateful)</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/chat</code><br>Body: <code>{"message": "..."}</code></td>
-                            <td style="padding: 10px 14px;">Mengirim instruksi analisis lanjutan (seperti "Buatkan Acceptance Criteria", "Susun Approval Matrix") secara berkesinambungan.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">2. Send Chat to Session (Stateful)</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(16,185,129,0.2); color: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">POST</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/chat</code><br>Body: <code>{"message": "..."}</code></td>
+                            <td style="padding: 12px 14px;">Mengirim instruksi analisis lanjutan secara interaktif berkesinambungan dengan konteks percakapan yang terus diingat agen BA.</td>
+                            <td style="padding: 12px 14px;">Penyusunan BRD multi-tahap (misal: "Buat daftar User Story" ➡️ "Tambahkan Acceptance Criteria tiap story" ➡️ "Susun Approval Matrix").</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
-                            <td style="padding: 10px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis yang pernah dihasilkan pada sesi tersebut.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
+                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis yang pernah dihasilkan pada <code>session_id</code> tersebut.</td>
+                            <td style="padding: 12px 14px;">Memuat ulang riwayat percakapan BRD pada UI portal pengguna atau melakukan audit trail terhadap dokumen kebutuhan bisnis yang dibuat.</td>
                         </tr>
                         <tr>
-                            <td style="padding: 10px 14px; font-weight: 600; color: #fff;">4. Delete Session</td>
-                            <td style="padding: 10px 14px; text-align: center;"><span style="background: rgba(244,63,94,0.2); color: #f43f5e; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">DELETE</span></td>
-                            <td style="padding: 10px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id</code></td>
-                            <td style="padding: 10px 14px;">Menghapus sesi perancangan BRD/FSD yang sudah selesai atau tidak digunakan lagi dari database server.</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Delete Session</td>
+                            <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(244,63,94,0.2); color: #f43f5e; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">DELETE</span></td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id</code></td>
+                            <td style="padding: 12px 14px;">Menghapus data sesi beserta seluruh riwayat percakapannya dari database SQLite server (hermes own).</td>
+                            <td style="padding: 12px 14px;">Membersihkan sesi analisis yang sudah selesai di-export ke BRD/FSD final, atau menghapus percakapan uji coba yang tidak lagi digunakan.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -401,7 +408,7 @@
     {
       "name": "Native Hermes Sessions API (/api/sessions)",
       "item": [
-        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions" } },
+        { "name": "1. Create New Session", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions", "description": "Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan session_id dari chat tersebut." } },
         { "name": "2. Send Chat to Session (Stateful)", "request": { "method": "POST", "url": "{{baseUrl}}/api/sessions/{{session_id}}/chat" } },
         { "name": "3. Get Session Messages History", "request": { "method": "GET", "url": "{{baseUrl}}/api/sessions/{{session_id}}/messages" } },
         { "name": "4. Delete Session", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/sessions/{{session_id}}" } }

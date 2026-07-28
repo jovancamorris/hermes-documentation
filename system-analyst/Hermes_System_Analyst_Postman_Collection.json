@@ -98,7 +98,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "sessions"]
             },
-            "description": "Membuat sesi percakapan baru di database server. Mengembalikan session_id unik."
+            "description": "Starter chat yang mana nanti akan disimpan di SQLite server (hermes own). Mengembalikan session_id dari chat tersebut."
           }
         },
         {

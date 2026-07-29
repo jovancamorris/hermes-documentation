@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKSAD Hermes Agent: Audit Skills &amp; Capabilities Spreadsheet Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: rgba(21, 29, 46, 0.75);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-main: 'Inter', system-ui, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 40px 24px 80px 24px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border-card); }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-light); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        
+        header { margin-bottom: 36px; }
+        .badge-header { display: inline-flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+        h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+        .subtitle { color: var(--text-muted); font-size: 1.05rem; max-width: 900px; }
+
+        /* Stats Strip */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 20px; text-align: center; }
+        .stat-num { font-size: 2rem; font-weight: 800; font-family: var(--font-code); color: #fff; }
+        .stat-lbl { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 4px; }
+
+        .card-box { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 32px; margin-bottom: 40px; }
+        
+        .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .search-box { background: #060911; border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 16px; color: #fff; font-size: 0.9rem; width: 320px; font-family: var(--font-main); }
+        .download-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%); color: #fff; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.88rem; box-shadow: 0 0 15px rgba(16,185,129,0.3); }
+
+        .tw { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-card); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
+        th { background: rgba(15, 23, 42, 0.95); color: #fff; font-weight: 700; padding: 14px 18px; border-bottom: 1px solid var(--border-card); }
+        td { padding: 14px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: var(--text-muted); vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .chk-box { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; }
+        .chk-yes { background: rgba(16,185,129,0.2); color: var(--accent-emerald); border: 1px solid rgba(16,185,129,0.4); }
+        .chk-no { background: rgba(244,63,94,0.15); color: var(--accent-rose); border: 1px solid rgba(244,63,94,0.3); }
+
+        .badge-status { font-weight: 700; font-family: var(--font-code); font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; }
+        .st-active { background: rgba(16,185,129,0.15); color: var(--accent-emerald); border: 1px solid rgba(16,185,129,0.3); }
+        .st-inactive { background: rgba(244,63,94,0.15); color: var(--accent-rose); border: 1px solid rgba(244,63,94,0.3); }
+
+        code { font-family: var(--font-code); background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); }
+
+        footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid var(--border-card); color: var(--text-muted); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a href="index.html" class="back-link">&larr; Kembali ke Portal Home Hub</a>
+        <div style="font-family:var(--font-code);font-size:0.8rem;color:var(--text-muted)">
+            Hermes Server: 203.145.34.37 | Audit Matrix
+        </div>
+    </div>
+
+    <header>
+        <div class="badge-header">📊 EKSAD Hermes Agent Skill Audit</div>
+        <h1>Spreadsheet Audit Matrix: Skill &amp; Capability Hermes Server</h1>
+        <p class="subtitle">
+            Tabel komparasi komprehensif seluruh skill, role instruction, dan MCP tool yang terdaftar di repositori <a href="https://github.com/Ikaf19/eksad-agentic-knowledge" target="_blank" style="color:var(--primary-light)">Ikaf19/eksad-agentic-knowledge</a> vs yang ter-install &amp; aktif pada **Hermes Server (203.145.34.37)**.
+        </p>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--primary-light)">20</div>
+            <div class="stat-lbl">Total Item Evaluasi</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--accent-cyan)">20 / 20</div>
+            <div class="stat-lbl">Tersedia di Repo GitHub</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--accent-emerald)">12 Active</div>
+            <div class="stat-lbl">Terinstall &amp; Aktif di Server</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--accent-rose)">8 Inactive</div>
+            <div class="stat-lbl">Belum Dideploy ke Server</div>
+        </div>
+    </div>
+
+    <!-- Table Box -->
+    <div class="card-box">
+        <div class="toolbar">
+            <input type="text" id="searchInput" onkeyup="filterTable()" class="search-box" placeholder="🔍 Cari nama skill, role, atau deskripsi...">
+            <a href="../docs-export/hermes_skills_audit_matrix.csv" download class="download-btn">
+                📥 Download CSV Spreadsheet (.csv)
+            </a>
+        </div>
+
+        <div class="tw">
+            <table id="skillsTable">
+                <thead>
+                    <tr>
+                        <th style="width:40px">#</th>
+                        <th>Kategori</th>
+                        <th>Nama Skill / Role / Tool</th>
+                        <th>Cakupan Deskripsi &amp; Kemampuan</th>
+                        <th style="text-align:center">Ada di Repo (Ikaf19)</th>
+                        <th style="text-align:center">Ter-install di Hermes Server (203.145.34.37)</th>
+                        <th style="text-align:center">Status Check</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>system-analyst</strong></td>
+                        <td>TSD Design, Flyway DDL (7 Audit Columns), REST API Catalog, RabbitMQ Event Schemas, AppSec STRIDE.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (Port 8643)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>business-analyst</strong></td>
+                        <td>BRD, FSD, User Stories, Acceptance Criteria (Given-When-Then), Approval Matrix.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (Port 8642)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>developer</strong></td>
+                        <td>Quarkus Reactive Coding, Mutiny Emitter, Spring Boot 3.x, Flyway Migrations, Unit Tests.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (SOUL.md)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>devops-engineer</strong></td>
+                        <td>Docker Containerization, Kubernetes Manifests, CI/CD Pipeline, Environment Variables, SSH Admin.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (Server Admin)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>project-manager</strong></td>
+                        <td>WBS Task Breakdown, Sprint Planning, Resource Allocation, Milestones Tracking.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>qa</strong></td>
+                        <td>Test Plan, Automated API Testing, Postman Collection Verification, Regression Test Suites.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>technical-leader</strong></td>
+                        <td>Architecture Review, ADR Approvals, Tech Stack Governance, Code Review Standards.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (SOUL.md)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td><code>Role Agent</code></td>
+                        <td><strong>vibe-coding</strong></td>
+                        <td>Fast-track Prototyping, Code Generation, Rapid Web UI Iteration.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>codebase-memory</strong></td>
+                        <td>Repository Codebase Indexing, Symbol Search, &amp; Long-term Codebase Memory.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (MCP)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>postgres-schema-readonly</strong></td>
+                        <td>PostgreSQL DDL Inspection &amp; Schema Query Integration.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (MCP)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>github-readonly</strong></td>
+                        <td>GitHub Version Control Repository Sync &amp; Commit Tracking.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (MCP)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>gitlab-readonly</strong></td>
+                        <td>GitLab Version Control Repository Sync &amp; MR Inspection.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>openapi-contract</strong></td>
+                        <td>OpenAPI / Swagger Spec Validation &amp; Schema Generation.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (MCP)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>playwright-browser</strong></td>
+                        <td>E2E Web UI Automated Testing &amp; Browser Automation.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>sonarqube-readonly</strong></td>
+                        <td>Code Quality, Vulnerability Inspection, &amp; Code Smell Auditing.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>trivy-evidence</strong></td>
+                        <td>Security Vulnerability Scanning &amp; Container Evidence Auditing.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-no">❌</span></td>
+                        <td style="text-align:center"><span class="badge-status st-inactive">🔴 INACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td><code>MCP Tool</code></td>
+                        <td><strong>rag-api-readonly</strong></td>
+                        <td>Retrieval-Augmented Generation Knowledge Base Search.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (MCP)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td><code>Core System</code></td>
+                        <td><strong>soul-system-prompt</strong></td>
+                        <td>EKSAD Non-negotiable Architecture Guidelines &amp; Rules.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (SOUL.md)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td><code>Core System</code></td>
+                        <td><strong>session-persistence</strong></td>
+                        <td>SQLite/PostgreSQL Permanent Chat History &amp; Token Accounting.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (Server DB)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td><code>Core System</code></td>
+                        <td><strong>streaming-sse</strong></td>
+                        <td>Real-time SSE Server-Sent Events Typing Animation.</td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span></td>
+                        <td style="text-align:center"><span class="chk-box chk-yes">☑</span> (Gateway v2.3)</td>
+                        <td style="text-align:center"><span class="badge-status st-active">✅ ACTIVE</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 PT EKSAD Solusi Digital — EKSAD Agentic Knowledge Framework</p>
+    </footer>
+</div>
+
+<script>
+    function filterTable() {
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById("skillsTable");
+        var tr = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < tr.length; i++) {
+            var textContent = tr[i].textContent || tr[i].innerText;
+            if (textContent.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+</script>
+</body>
+</html>

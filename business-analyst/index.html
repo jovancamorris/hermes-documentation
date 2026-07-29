@@ -389,17 +389,17 @@
                             <td style="padding: 12px 14px;">Penyusunan BRD multi-tahap (misal: "Buat daftar User Story" ➡️ "Tambahkan Acceptance Criteria" ➡️ "Susun Approval Matrix").</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History &amp; Usage</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History (Descending)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
-                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis &amp; akumulasi pemakaian token (<code>accumulated_usage</code>).</td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages?order=desc</code></td>
+                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat analisis kebutuhan bisnis dalam urutan Descending (Terbaru &rarr; Terlama) &amp; akumulasi pemakaian token (<code>accumulated_usage</code>).</td>
                             <td style="padding: 12px 14px;">Memuat ulang riwayat percakapan BRD pada UI portal pengguna atau melakukan audit trail terhadap dokumen kebutuhan bisnis.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List (Descending)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code></td>
-                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi analisis kebutuhan bisnis yang tersimpan di database server.</td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions?order=desc</code></td>
+                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi analisis kebutuhan bisnis yang tersimpan di database server dalam urutan Descending (Terbaru &rarr; Terlama).</td>
                             <td style="padding: 12px 14px;">Menampilkan daftar sesi BRD/FSD di dashboard UI portal.</td>
                         </tr>
                         <tr>

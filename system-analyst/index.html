@@ -395,18 +395,18 @@
                             <td style="padding: 12px 14px;">Perancangan TSD multi-tahap (misal: "Buat DDL PostgreSQL" ➡️ "Tambahkan audit trail" ➡️ "Buatkan RabbitMQ Event Schema").</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History &amp; Usage</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">3. Get Session Messages History (Descending)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages</code></td>
-                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat perancangan TSD &amp; akumulasi pemakaian token (<code>accumulated_usage</code>).</td>
-                            <td style="padding: 12px 14px;">Memuat ulang dokumentasi TSD pada UI SA, atau menguji konsistensi skema database yang dihasilkan agen selama proses perancangan.</td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions/:session_id/messages?order=desc</code></td>
+                            <td style="padding: 12px 14px;">Mengambil seluruh rekam jejak riwayat perancangan TSD dalam urutan Descending (Terbaru &rarr; Terlama) &amp; akumulasi pemakaian token.</td>
+                            <td style="padding: 12px 14px;">Memuat ulang dokumentasi TSD pada UI SA (pesan terbaru di atas), atau mengunduh dokumen TSD hasil generate agen.</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--border-card);">
-                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List</td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #fff;">4. Get All Active Sessions List (Descending)</td>
                             <td style="padding: 12px 14px; text-align: center;"><span style="background: rgba(6,182,212,0.2); color: var(--accent-cyan); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">GET</span></td>
-                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions</code></td>
-                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi percakapan aktif yang tersimpan di database server.</td>
-                            <td style="padding: 12px 14px;">Menampilkan daftar sesi proyek TSD aktif di dashboard UI atau audit administrasi server.</td>
+                            <td style="padding: 12px 14px; font-family: var(--font-code); font-size: 0.82rem;"><code>/api/sessions?order=desc</code></td>
+                            <td style="padding: 12px 14px;">Memanggil daftar seluruh sesi percakapan aktif yang tersimpan di database server dalam urutan Descending (Terbaru &rarr; Terlama).</td>
+                            <td style="padding: 12px 14px;">Menampilkan daftar sesi proyek TSD aktif di dashboard UI dari yang paling baru dikerjakan.</td>
                         </tr>
                         <tr>
                             <td style="padding: 12px 14px; font-weight: 600; color: #fff;">5. Delete Session</td>

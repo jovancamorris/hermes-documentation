@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "sa-hermes-official-v2",
-    "name": "Hermes Agent - System Analyst Postman Collection (v2.2 Official)",
-    "description": "Postman Collection resmi v2.2 untuk EKSAD System Analyst Agent (Port 8643). Berisi skenario pembuatan sesi dengan 8 variabel user_context (user_id, username, role, department, project_id, project_name, tenant_id, tenant_name), eksekusi perancangan dokumen TSD, verifikasi histori pesan database disk, serta panduan unduh/akses dokumen hasil generate.",
+    "_postman_id": "sa-hermes-test-scenarios-v2",
+    "name": "Hermes Agent - SA Advanced Testing Scenarios (jopCoba)",
+    "description": "Postman Collection khusus pengujian End-to-End EKSAD System Analyst Agent (Port 8643). Berisi skenario lengkap pembuatan sesi dengan 8 variabel user_context (user_id, username, role, department, project_id, project_name, tenant_id, tenant_name), eksekusi perancangan dokumen TSD, verifikasi histori pesan database disk, serta cara akses/download dokumen hasil generate.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -151,6 +151,7 @@
                   "    var jsonData = pm.response.json();",
                   "    var content = jsonData.content || '';",
                   "    pm.expect(content).to.include('Procurement');",
+                  "    pm.expect(content).to.include('{{project_name}}');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -167,7 +168,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"[USER_CONTEXT]\\n{\\n  \\\"user_id\\\": \\\"{{user_id}}\\\",\\n  \\\"username\\\": \\\"jovan_sa_test\\\",\\n  \\\"role\\\": \\\"System Analyst\\\",\\n  \\\"department\\\": \\\"IT Architecture Team\\\",\\n  \\\"project_id\\\": \\\"{{project_id}}\\\",\\n  \\\"project_name\\\": \\\"{{project_name}}\\\",\\n  \\\"tenant_id\\\": \\\"{{tenant_id}}\\\",\\n  \\\"tenant_name\\\": \\\"{{tenant_name}}\\\"\\n}\\n\\nHalo Hermes System Analyst Agent! Tolong buatkan dokumen TSD (Technical Specification Document) lengkap untuk microservice Svc Procurement Approval (meliputi: Skema Flyway DDL 7 Audit Columns, API Contract REST @RolesAllowed, RabbitMQ Event Envelope Schema, & STRIDE Threat Modeling).\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+              "raw": "{\n  \"message\": \"[USER_CONTEXT]\\n{\\n  \\\"user_id\\\": \\\"{{user_id}}\\\",\\n  \\\"username\\\": \\\"jovan_sa_test\\\",\\n  \\\"role\\\": \\\"System Analyst\\\",\\n  \\\"department\\\": \\\"IT Architecture Team\\\",\\n  \\\"project_id\\\": \\\"{{project_id}}\\\",\\n  \\\"project_name\\\": \\\"{{project_name}}\\\",\\n  \\\"tenant_id\\\": \\\"{{tenant_id}}\\\",\\n  \\\"tenant_name\\\": \\\"{{tenant_name}}\\\"\\n}\\n\\nHalo Hermes System Analyst Agent! Tolong sebutkan seluruh detail user_context saya (user_id, username, role, department, project_id, project_name, tenant_id, tenant_name) yang kamu terima, lalu buatkan dokumen TSD (Technical Specification Document) lengkap untuk microservice Svc Procurement Approval (meliputi: Skema Flyway DDL 7 Audit Columns, API Contract REST @RolesAllowed, RabbitMQ Event Envelope Schema, & STRIDE Threat Modeling).\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",

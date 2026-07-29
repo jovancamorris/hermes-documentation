@@ -147,29 +147,43 @@
           }
         },
         {
-          "name": "3. Get Session Messages History & Usage",
+          "name": "3. Get Session Messages History (Descending Order: Terbaru -> Terlama)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages",
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages?order=desc",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "sessions", "{{session_id}}", "messages"]
+              "path": ["api", "sessions", "{{session_id}}", "messages"],
+              "query": [
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Urutkan pesan dari yang Paling Baru (Terbaru) ke yang Paling Lama (Terlama)"
+                }
+              ]
             },
-            "description": "Mengambil seluruh daftar riwayat obrolan (Chat History) dan akumulasi pemakaian token (accumulated_usage) yang tersimpan pada session_id bersangkutan."
+            "description": "Mengambil seluruh daftar riwayat obrolan (Chat History) dalam urutan Descending (Terbaru -> Terlama) dan akumulasi pemakaian token dari server."
           }
         },
         {
-          "name": "4. Get All Active Sessions List",
+          "name": "4. Get All Active Sessions List (Descending Order: Terbaru -> Terlama)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/sessions",
+              "raw": "{{baseUrl}}/api/sessions?order=desc",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "sessions"]
+              "path": ["api", "sessions"],
+              "query": [
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Urutkan sesi dari yang Paling Baru ke yang Paling Lama"
+                }
+              ]
             },
-            "description": "Memanggil daftar seluruh sesi percakapan yang tersimpan di server database Hermes."
+            "description": "Memanggil daftar seluruh sesi percakapan yang tersimpan di server database Hermes dalam urutan Descending."
           }
         },
         {

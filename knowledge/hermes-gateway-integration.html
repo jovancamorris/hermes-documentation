@@ -590,11 +590,13 @@
         <div class="ss">
             <div class="ssh">
                 <span class="sn">GET</span>
-                <h3>7.3 Get Session Messages History (`/api/sessions/{session_id}/messages`)</h3>
+                <h3>7.3 Get Session Messages History (`/api/sessions/{session_id}/messages?order=desc`)</h3>
             </div>
-            <p>Mengambil seluruh rekam jejak obrolan dan akumulasi pemakaian token dari database server.</p>
+            <p>
+                Mengambil seluruh rekam jejak obrolan dan akumulasi pemakaian token dari database server. Tambahkan parameter <code>?order=desc</code> untuk mengurutkan pesan dari **yang Paling Baru (Terbaru) ke yang Paling Lama (Terlama)**.
+            </p>
 
-<pre><span class="lb http">cURL Request</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages" \
+<pre><span class="lb http">cURL Request (Descending Order: Terbaru &rarr; Terlama)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages?order=desc" \
   -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
         </div>
     </div>
@@ -806,17 +808,17 @@ data: [DONE]</code></pre>
             </div>
         </div>
 
-        <!-- 10.3 Multi-User Session Query Filtering -->
+        <!-- 10.3 Multi-User Session Query Filtering & Descending Order -->
         <div class="ss">
             <div class="ssh">
                 <span class="sn">FILTER</span>
-                <h3>10.3 Filter Sesi per User (`GET /api/sessions?user_id=...`)</h3>
+                <h3>10.3 Filter Sesi &amp; Urutan Descending (`GET /api/sessions?order=desc`)</h3>
             </div>
             <p>
-                Untuk menampilkan daftar riwayat sesi milik pengguna tertentu di sidebar Web Portal EKSAD, developer dapat menambahkan query parameter <code>user_id</code> atau <code>role</code> pada endpoint list sessions:
+                Untuk menampilkan daftar riwayat sesi milik pengguna tertentu di sidebar Web Portal EKSAD dari **yang Paling Baru (Terbaru) ke yang Paling Lama (Terlama)**, developer dapat menambahkan query parameter <code>order=desc</code> serta <code>user_id</code> atau <code>role</code> pada endpoint list sessions:
             </p>
 
-<pre><span class="lb http">cURL Request Filter Sesi User</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions?user_id=USR-10293&limit=20" \
+<pre><span class="lb http">cURL Request Filter Sesi (Descending Order: Terbaru &rarr; Terlama)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions?user_id=USR-TEST-001&order=desc&limit=20" \
   -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
         </div>
 

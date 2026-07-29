@@ -183,6 +183,7 @@
     <a href="#sec-dev-endpoints" class="ta">7. API Endpoint Contracts</a>
     <a href="#sec-dev-postman" class="ta">8. Postman Collection Import</a>
     <a href="#sec-dev-prompts" class="ta">9. Prompt Templates Siap Pakai</a>
+    <a href="#sec-dev-portal" class="ta">10. Web Portal Integration Specs</a>
 </aside>
 
 <main class="main">
@@ -507,6 +508,16 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="clo note">
+            <div class="ci">🔑</div>
+            <div class="cb">
+                <div class="cl">Siapa yang Men-setup API_SERVER_KEY?</div>
+                <p>
+                    <strong>DevOps / Admin Infrastructure Server</strong>. Token ini disetup oleh Admin Server di file environment gateway (misal: <code>HERMES_API_SERVER_KEY</code> di <code>/opt/hermes-gateway/.env</code> pada server <code>203.145.34.37</code>). Token ini kemudian dibagikan kepada **Tim Developer** untuk dipasang pada header request HTTP (<code>Authorization: Bearer &lt;API_SERVER_KEY&gt;</code>) di aplikasi Web Portal / Postman.
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- SECTION 7: API ENDPOINT CONTRACTS -->
@@ -671,6 +682,160 @@ Fokus ringkasan:
 4. Rekomendasi API Contract & Postman Collection untuk tim pengembang (Developer).
 
 Gunakan bahasa profesional, jelas, dan format ringkas (bullet points & tabel).</code></pre>
+    </div>
+
+    <!-- SECTION 10: DEVELOPER WEB PORTAL INTEGRATION SPECS (NEW) -->
+    <div class="sc" id="sec-dev-portal">
+        <div class="sh">
+            <div class="ib cy">💻</div>
+            <div class="stg">
+                <h2>10. Developer Web Portal Integration Specs &amp; Technical Q&amp;A</h2>
+                <p>Spesifikasi teknis komprehensif bagi Software Developer yang membangun EKSAD Hermes Web Portal Interface.</p>
+            </div>
+        </div>
+
+        <!-- 10.1 Streaming -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">STREAM</span>
+                <h3>10.1 Real-Time Streaming Response Spec (`stream: true`)</h3>
+            </div>
+            <p>
+                Untuk menghasilkan efek *typing animation* real-time di UI Web Portal seperti ChatGPT, sertakan parameter <code>"stream": true</code> pada payload request chat. Server Gateway akan mengembalikan data dalam format **Server-Sent Events (SSE)** <code>Content-Type: text/event-stream</code>.
+            </p>
+
+<pre><span class="lb json">Payload Request (dengan Stream Flag)</span><code>{
+  "message": "Tolong buatkan skrip DDL SQL untuk tabel user_account.",
+  "stream": true,
+  "user_context": { "user_id": "USR-10293" }
+}</code></pre>
+
+<pre><span class="lb py">Contoh Stream Chunk Server Response (text/event-stream)</span><code>data: {"id":"msg_101","choices":[{"delta":{"content":"CREATE"}}]}
+
+data: {"id":"msg_101","choices":[{"delta":{"content":" TABLE"}}]}
+
+data: {"id":"msg_101","choices":[{"delta":{"content":" user_account..."}}]}
+
+data: [DONE]</code></pre>
+
+            <h4>Contoh Code JavaScript Fetch Reader (Frontend Web Portal):</h4>
+<pre><span class="lb py">JavaScript Code Snippet</span><code>async function sendStreamingChat(sessionId, userMessage) {
+    const response = await fetch(`http://203.145.34.37:8643/api/sessions/${sessionId}/chat`, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: userMessage, stream: true })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let responseText = "";
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
+        for (const line of lines) {
+            if (line.startsWith("data: ") && line !== "data: [DONE]") {
+                const data = JSON.parse(line.replace("data: ", ""));
+                if (data.choices && data.choices[0].delta.content) {
+                    responseText += data.choices[0].delta.content;
+                    updateUI(responseText); // Function update DOM UI
+                }
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- 10.2 Standard Error Response JSON Contract -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:var(--rd);color:var(--ro);border-color:rgba(244,63,94,0.3)">ERROR</span>
+                <h3>10.2 Standard Error Response JSON Contract</h3>
+            </div>
+            <p>
+                Ketika terjadi kesalahan otentikasi, rate limit, atau kegagalan internal server, Gateway mengembalikan format JSON Error standar EKSAD:
+            </p>
+
+<pre><span class="lb json">Format Error Payload (401 / 404 / 429 / 500)</span><code>{
+  "error": {
+    "code": "SESSION_NOT_FOUND",
+    "message": "Session ID 'api_99882211' tidak ditemukan pada database server.",
+    "status": 404,
+    "timestamp": 1785212900
+  }
+}</code></pre>
+
+            <div class="tw">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>HTTP Status Code</th>
+                            <th>Error Code</th>
+                            <th>Penyebab &amp; Cara Handling di Frontend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>401 Unauthorized</code></td>
+                            <td><code>INVALID_API_KEY</code></td>
+                            <td>Bearer Token <code>API_SERVER_KEY</code> tidak valid atau kadaluarsa. Tampilkan notifikasi "Session Expired / Auth Error".</td>
+                        </tr>
+                        <tr>
+                            <td><code>404 Not Found</code></td>
+                            <td><code>SESSION_NOT_FOUND</code></td>
+                            <td><code>session_id</code> tidak ada di database server. Arahkan Frontend untuk membuat sesi baru via <code>POST /api/sessions</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>429 Too Many Requests</code></td>
+                            <td><code>RATE_LIMIT_EXCEEDED</code></td>
+                            <td>Pemakaian token melampaui kuota per menit. Tampilkan notifikasi cooldown &amp; retry delay.</td>
+                        </tr>
+                        <tr>
+                            <td><code>500 Internal Error</code></td>
+                            <td><code>LLM_PROVIDER_TIMEOUT</code></td>
+                            <td>Server backend / model LLM timeout. Tampilkan tombol "Retry Request".</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 10.3 Multi-User Session Query Filtering -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">FILTER</span>
+                <h3>10.3 Filter Sesi per User (`GET /api/sessions?user_id=...`)</h3>
+            </div>
+            <p>
+                Untuk menampilkan daftar riwayat sesi milik pengguna tertentu di sidebar Web Portal EKSAD, developer dapat menambahkan query parameter <code>user_id</code> atau <code>role</code> pada endpoint list sessions:
+            </p>
+
+<pre><span class="lb http">cURL Request Filter Sesi User</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions?user_id=USR-10293&limit=20" \
+  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+        </div>
+
+        <!-- 10.4 Frontend Markdown & Mermaid Rendering -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">RENDER</span>
+                <h3>10.4 Rekomendasi Library UI Rendering Frontend</h3>
+            </div>
+            <p>
+                Jawaban dari Hermes Agent mengandung sintaks Markdown, blok kode DDL SQL, dan diagram Mermaid. Rekomendasi stack UI Frontend EKSAD Web Portal:
+            </p>
+            <ul>
+                <li><strong>Markdown Renderer:</strong> <code>react-markdown</code> / <code>markdown-it</code>.</li>
+                <li><strong>Syntax Highlighting:</strong> <code>prismjs</code> / <code>highlight.js</code> (mendukung SQL, JSON, &amp; Java).</li>
+                <li><strong>Diagram Renderer:</strong> <code>mermaid.js</code> (otomatis me-render diagram alur sequence &amp; arsitektur).</li>
+                <li><strong>Copy Code Button:</strong> Sertakan tombol *Copy to Clipboard* pada setiap header blok kode <code>pre code</code>.</li>
+            </ul>
+        </div>
     </div>
 
     <!-- Footer -->

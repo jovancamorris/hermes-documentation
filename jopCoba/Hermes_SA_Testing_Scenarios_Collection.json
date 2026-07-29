@@ -26,9 +26,9 @@
     },
     {
       "key": "model",
-      "value": "system-analyst",
+      "value": "gpt-4o",
       "type": "string",
-      "description": "Model Profile aktif untuk System Analyst (MiniMax-M2)"
+      "description": "Model Profile LLM backend yang didukung (gpt-4o / claude-3-5-sonnet)"
     },
     {
       "key": "user_id",

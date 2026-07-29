@@ -1,0 +1,435 @@
+{
+  "info": {
+    "_postman_id": "sa-hermes-comprehensive-master-v1",
+    "name": "Hermes Agent - SA Master Collection (All APIs & Full Scenarios)",
+    "description": "Postman Collection MASTER paling lengkap untuk EKSAD System Analyst Agent (Port 8643). Menguji seluruh API Gateway yang dimiliki Hermes: Discovery /v1/models, Health Check /health, Stateless /v1/chat/completions, Stateful Session Lifecycle /api/sessions (Create, Chat, Stream SSE, History order=desc, List Filter user_id, Delete), serta 5 Skenario Uji Perancangan Dokumen SA (TSD, Flyway DDL 7 Audit Cols, REST @RolesAllowed, RabbitMQ Event Schemas, & STRIDE Threat Analysis).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://203.145.34.37:8643",
+      "type": "string",
+      "description": "Base URL API Gateway System Analyst (Port 8643)"
+    },
+    {
+      "key": "apiKey",
+      "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9",
+      "type": "string",
+      "description": "API_SERVER_KEY (Bearer Token Auth)"
+    },
+    {
+      "key": "session_id",
+      "value": "api_master_sa_session_001",
+      "type": "string",
+      "description": "Session ID aktif (otomatis ter-update saat eksekusi Create Session)"
+    },
+    {
+      "key": "model",
+      "value": "gpt-4o",
+      "type": "string",
+      "description": "Model Profile LLM backend yang didukung (gpt-4o / claude-3-5-sonnet)"
+    },
+    {
+      "key": "user_id",
+      "value": "USR-TEST-MASTER",
+      "type": "string",
+      "description": "ID Pengguna Master Penguji"
+    },
+    {
+      "key": "project_id",
+      "value": "prj_master_01",
+      "type": "string",
+      "description": "ID Proyek Master"
+    },
+    {
+      "key": "project_name",
+      "value": "nagamas",
+      "type": "string",
+      "description": "Nama Proyek EKSAD"
+    },
+    {
+      "key": "tenant_id",
+      "value": "tnt_master_01",
+      "type": "string",
+      "description": "ID Tenant Isolation"
+    },
+    {
+      "key": "tenant_name",
+      "value": "byd",
+      "type": "string",
+      "description": "Nama Client Tenant"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{apiKey}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. 🚀 Discovery & Health Check APIs",
+      "item": [
+        {
+          "name": "1.1 Discovery Models (`GET /v1/models`)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/models",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "models"]
+            },
+            "description": "Menguji ketersediaan model SA (system-analyst) pada Port 8643."
+          }
+        },
+        {
+          "name": "1.2 Server Health Check (`GET /health`)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Memeriksa status kesehatan gateway server dan konektivitas LLM provider."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. ⚡ Stateless Chat Completion API (OpenAI Compatible)",
+      "item": [
+        {
+          "name": "2.1 Stateless Chat Completion (`POST /v1/chat/completions`)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{model}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Anda adalah EKSAD System Analyst Agentic AI. Berikan respon presisi tanpa halusinasi.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Jelaskan 3 aturan emas pembuatan Flyway DDL PostgreSQL sesuai standar EKSAD (7 audit columns, soft delete, epoch millisecond timestamp).\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/chat/completions",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            },
+            "description": "Menguji pemanggilan API obrolan stateless (tanpa memelihara session_id) kompatibel dengan SDK OpenAI."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. 🧪 Native Stateful Session Lifecycle APIs (`/api/sessions`)",
+      "item": [
+        {
+          "name": "3.1 Create New Session (`POST /api/sessions`)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var sid = (jsonData.session && jsonData.session.id) ? jsonData.session.id : jsonData.session_id;",
+                  "    if (sid) {",
+                  "        pm.collectionVariables.set('session_id', sid);",
+                  "        console.log('✅ Auto-captured session_id: ' + sid);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Master Test SA Session - Svc Procurement Approval TSD\",\n  \"model\": \"{{model}}\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions"]
+            },
+            "description": "Membuat sesi percakapan stateful baru dan menyimpan 8 variabel user_context di database server."
+          }
+        },
+        {
+          "name": "3.2 Send Chat Message (`POST /api/sessions/{{session_id}}/chat`)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"[USER_CONTEXT]\\n{\\n  \\\"user_id\\\": \\\"{{user_id}}\\\",\\n  \\\"username\\\": \\\"jovan_sa_test\\\",\\n  \\\"role\\\": \\\"System Analyst\\\",\\n  \\\"department\\\": \\\"IT Architecture Team\\\",\\n  \\\"project_id\\\": \\\"{{project_id}}\\\",\\n  \\\"project_name\\\": \\\"{{project_name}}\\\",\\n  \\\"tenant_id\\\": \\\"{{tenant_id}}\\\",\\n  \\\"tenant_name\\\": \\\"{{tenant_name}}\\\"\\n}\\n\\nHalo Hermes Agent! Konfirmasi bahwa kamu telah menerima 8 variabel user_context saya, lalu berikan outline TSD singkat untuk proyek {{project_name}}.\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Mengirimkan pesan ke sesi aktif. Server Hermes mengingat seluruh konteks sebelumnya."
+          }
+        },
+        {
+          "name": "3.3 Real-Time SSE Streaming Chat (`POST /api/sessions/{{session_id}}/chat` stream=true)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan skrip Flyway DDL PostgreSQL singkat untuk tabel procurement_request.\",\n  \"stream\": true,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Menguji fitur real-time streaming response Server-Sent Events (text/event-stream) untuk animasi mengetik di Web Portal."
+          }
+        },
+        {
+          "name": "3.4 Get Session Messages History (`GET /api/sessions/{{session_id}}/messages?order=desc`)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var msgs = jsonData.messages || jsonData.data;",
+                  "    if (msgs && Array.isArray(msgs)) {",
+                  "        msgs.reverse();",
+                  "        console.log('✅ Chat History reversed: Pesan Terbaru [0] sekarang berada di paling atas!');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages?order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "messages"],
+              "query": [
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Urutkan pesan dari Terbaru ke Terlama"
+                }
+              ]
+            },
+            "description": "Menarik rekam jejak obrolan dalam urutan Descending (Terbaru di paling atas [0])."
+          }
+        },
+        {
+          "name": "3.5 List Active Sessions Filtered (`GET /api/sessions?user_id=...&order=desc`)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions?user_id={{user_id}}&order=desc&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}",
+                  "description": "Filter sesi berdasarkan ID User Penguji"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Urutkan dari Sesi Terbaru ke Terlama"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Memanggil daftar seluruh sesi aktif yang difilter per user_id dalam urutan Descending."
+          }
+        },
+        {
+          "name": "3.6 Delete Session (`DELETE /api/sessions/{{session_id}}`)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response Code 200/204', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}"]
+            },
+            "description": "Menghapus sesi percakapan dan membersihkan memori dari server."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. 📑 All 5 SA Document Generation Test Scenarios",
+      "item": [
+        {
+          "name": "Scenario 1 - Full TSD Architecture Document Generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan Dokumen TSD (Technical Specification Document) lengkap §1–§20 untuk microservice Svc Procurement Approval proyek {{project_name}} (tenant: {{tenant_name}}). Sertakan Stack Profile Tier-1 Quarkus Reactive RabbitMQ, port 8087, JWT RS256 via JWKS, dan package structure.\",\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Skenario pengujian pembentukan Dokumen TSD Utama utuh 20 seksi."
+          }
+        },
+        {
+          "name": "Scenario 2 - Flyway DDL SQL Migration (7 Audit Cols & Reserved Fields)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan skrip Flyway DDL SQL V1__init_procurement_approval.sql untuk 4 tabel: purchase_request, approval_history, vendor_cache, department_cache. Pastikan 7 audit columns wajib, soft delete, BIGINT epoch millis, NUMERIC(20,4), dan 13 reserved fields opted-in untuk transactional entities.\",\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Skenario pengujian perancangan skema database DDL PostgreSQL."
+          }
+        },
+        {
+          "name": "Scenario 3 - REST API Catalog & RBAC Security Mapping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan Katalog API REST lengkap 15 endpoint untuk Svc Procurement Approval dengan pemetaan otorisasi RBAC @RolesAllowed(ROLE_REQUESTER, ROLE_APPROVER, ROLE_ADMIN).\",\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Skenario pengujian perancangan API Contract & Otorisasi RBAC."
+          }
+        },
+        {
+          "name": "Scenario 4 - RabbitMQ Event Schemas & Topology",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan skema RabbitMQ Event Topology (Exchange exc-procurement, Routing Keys, Queue q-procurement-submitted, DLQ) dan EKSAD Event Envelope JSON schema.\",\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Skenario pengujian perancangan Event-Driven Messaging RabbitMQ."
+          }
+        },
+        {
+          "name": "Scenario 5 - AppSec STRIDE Threat Modeling Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tolong buatkan Dokumen STRIDE Threat Modeling lengkap 6 kategori (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege) dengan pemetaan 28 ancaman dan rencana mitigasi.\",\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}", "chat"]
+            },
+            "description": "Skenario pengujian analisis ancaman keamanan aplikasi STRIDE."
+          }
+        }
+      ]
+    }
+  ]
+}

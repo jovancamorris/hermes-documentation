@@ -835,7 +835,28 @@ data: [DONE]</code></pre>
                 <li><strong>Markdown Renderer:</strong> <code>react-markdown</code> / <code>markdown-it</code>.</li>
                 <li><strong>Syntax Highlighting:</strong> <code>prismjs</code> / <code>highlight.js</code> (mendukung SQL, JSON, &amp; Java).</li>
                 <li><strong>Diagram Renderer:</strong> <code>mermaid.js</code> (otomatis me-render diagram alur sequence &amp; arsitektur).</li>
-                <li><strong>Copy Code Button:</strong> Sertakan tombol *Copy to Clipboard* pada setiap header blok kode <code>pre code</code>.</li>
+        <!-- 10.5 Document Retrieval Guide -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:rgba(16,185,129,0.2);color:var(--em);border-color:rgba(16,185,129,0.3)">DOWNLOAD</span>
+                <h3>10.5 Panduan Mengakses &amp; Mengunduh Dokumen Hasil Generate via Terminal SCP</h3>
+            </div>
+            <p>
+                Ketika Hermes Agent selesai me-generate paket dokumen di server (misal 10 file bundel TSD, Flyway DDL SQL, API Catalog, Event Schemas, &amp; STRIDE Threat Model di <code>/home/eksadpro/projects/{project_name}/{service_name}/</code>), gunakan perintah SCP di terminal komputer lokal Anda untuk mendownloadnya secara instan:
+            </p>
+
+            <h4 style="color:#fff;margin-top:16px;margin-bottom:8px">1. Perintah Terminal SCP (Copy &amp; Paste ke Command Prompt / PowerShell / Terminal):</h4>
+<pre><span class="lb http">Terminal Command Line (SCP Download)</span><code># Mengunduh Bundel Proyek Nagamas Svc Procurement Approval:
+scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/nagamas/svc-procurement-approval ./nagamas-docs
+
+# Skenario Umum: Mengunduh Bundel Proyek Lainnya:
+scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_name} ./{nama_folder_lokal}</code></pre>
+
+            <h4 style="color:#fff;margin-top:16px;margin-bottom:8px">2. Cara Membuka Dokumen Hasil Download di Komputer:</h4>
+            <ul>
+                <li><strong>Via File Explorer:</strong> Tekan <code>Win + R</code>, ketik <code>C:\Users\&lt;username&gt;\nagamas-docs</code>, lalu tekan <code>Enter</code>.</li>
+                <li><strong>Via Command Prompt / PowerShell:</strong> Ketik <code>explorer .\nagamas-docs</code>.</li>
+                <li><strong>Via VSCode:</strong> Klik <code>File &rarr; Open Folder</code> &rarr; arahkan ke folder <code>nagamas-docs</code>.</li>
             </ul>
         </div>
     </div>

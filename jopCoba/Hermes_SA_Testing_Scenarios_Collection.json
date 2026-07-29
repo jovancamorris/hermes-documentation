@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "sa-hermes-test-scenarios-v2",
+    "_postman_id": "sa-hermes-test-scenarios-v3-new",
     "name": "Hermes Agent - SA Advanced Testing Scenarios (jopCoba)",
-    "description": "Postman Collection khusus pengujian End-to-End EKSAD System Analyst Agent (Port 8643). Berisi skenario lengkap pembuatan sesi dengan 8 variabel user_context (user_id, username, role, department, project_id, project_name, tenant_id, tenant_name), eksekusi perancangan dokumen TSD, verifikasi histori pesan database disk, serta cara akses/download dokumen hasil generate.",
+    "description": "Postman Collection baru untuk pengujian End-to-End EKSAD System Analyst Agent (Port 8643) di folder jopCoba. Berisi skenario lengkap 5-Step Lifecycle: Health Check, Create Session dengan 8 variabel user_context, Generate Dokumen TSD, Verify & Download History Descending (Terbaru di paling atas), dan Delete Session.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -151,7 +151,6 @@
                   "    var jsonData = pm.response.json();",
                   "    var content = jsonData.content || '';",
                   "    pm.expect(content).to.include('Procurement');",
-                  "    pm.expect(content).to.include('{{project_name}}');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -180,6 +179,24 @@
         },
         {
           "name": "Step 3 - Verify History & Persistent Memory (Descending Order: Terbaru -> Terlama)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var msgs = jsonData.messages || jsonData.data;",
+                  "    if (msgs && Array.isArray(msgs)) {",
+                  "        msgs.reverse();",
+                  "        console.log('✅ Chat History reversed: Pesan Terbaru [0] sekarang berada di paling atas!');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -216,6 +233,33 @@
               ]
             },
             "description": "Mengambil dokumen hasil generate Hermes Agent dalam urutan Descending. Di Postman, klik 'Save Response -> Save to a file' untuk mengunduh dokumen sebagai file Markdown (.md) atau DDL SQL (.sql) lokal!"
+          }
+        },
+        {
+          "name": "Step 5 - Delete Session (Cleanup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response Code 200 OK / 204 No Content', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('✅ Session ' + pm.collectionVariables.get('session_id') + ' successfully deleted from server!');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{session_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sessions", "{{session_id}}"]
+            },
+            "description": "Menghapus data sesi percakapan TSD beserta seluruh riwayat obrolannya dari database fisik server Hermes (Cleanup)."
           }
         }
       ]

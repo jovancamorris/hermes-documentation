@@ -349,6 +349,24 @@
             </a>
         </div>
 
+        <!-- SCP TERMINAL COMMAND BOX -->
+        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 20px; margin-top: 24px;">
+            <div style="color: var(--accent-emerald); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                💻 Cara Mengunduh Dokumen Hasil Generate via Terminal SCP
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+                Setelah menjalankan test Postman, unduh seluruh paket bundel dokumen (TSD, Flyway DDL SQL, API Catalog, Event Schemas, &amp; STRIDE Threat Model) yang tersimpan di server <code>203.145.34.37</code> dengan perintah berikut:
+            </p>
+            <pre style="background: #060911; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; color: #34d399; font-family: var(--font-code); font-size: 0.85rem; overflow-x: auto;"><code># Mengunduh Bundel Dokumen TSD (Contoh Proyek Nagamas):
+scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/nagamas/svc-procurement-approval ./nagamas-docs
+
+# Format Perintah Umum:
+scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_name} ./{nama_folder_tujuan}</code></pre>
+            <p style="color: var(--text-dim); font-size: 0.84rem; margin-top: 10px;">
+                <em>*Catatan Akses: Hasil download akan tersimpan di folder <code>.\nagamas-docs</code> pada direktori terminal Anda. Buka dengan menekan <code>Win + R</code> &rarr; ketik <code>C:\Users\&lt;username&gt;\nagamas-docs</code> &rarr; Enter.</em>
+            </p>
+        </div>
+
         <div style="margin-top: 32px;">
             <h3 style="color: #fff; margin-bottom: 12px;">Daftar Request dalam Postman Collection, Fungsi, &amp; Skenario Penggunaannya:</h3>
             <div style="overflow-x: auto; margin-bottom: 24px;">

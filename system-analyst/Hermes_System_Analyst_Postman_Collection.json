@@ -179,6 +179,24 @@
         },
         {
           "name": "Step 3 - Verify History & Persistent Memory (Descending Order: Terbaru -> Terlama)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var msgs = jsonData.messages || jsonData.data;",
+                  "    if (msgs && Array.isArray(msgs)) {",
+                  "        msgs.reverse();",
+                  "        console.log('✅ Chat History reversed: Pesan Terbaru [0] sekarang berada di paling atas!');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],

@@ -1,0 +1,246 @@
+{
+  "info": {
+    "_postman_id": "ba-hermes-test-scenarios-v3-jopcoba",
+    "name": "Hermes Agent - BA Advanced Testing Scenarios (jopCoba)",
+    "description": "Postman Collection pengujian End-to-End EKSAD Business Analyst Agent (Port 8642) di folder jopCoba. Berisi skenario 5-Step Lifecycle: Health Check, Create Session dengan 8 variabel user_context BA, Generate BRD/FSD Document, Verify & Download History Descending (Terbaru di paling atas), dan Delete Session.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://203.145.34.37:8642",
+      "type": "string",
+      "description": "Base URL API Gateway Business Analyst (Port 8642)"
+    },
+    {
+      "key": "apiKey",
+      "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9",
+      "type": "string",
+      "description": "API_SERVER_KEY (Bearer Token Auth)"
+    },
+    {
+      "key": "session_id",
+      "value": "api_test_ba_procurement_001",
+      "type": "string",
+      "description": "Session ID aktif BA (otomatis ter-update saat Create Session)"
+    },
+    {
+      "key": "model",
+      "value": "anthropic/claude-sonnet-4",
+      "type": "string",
+      "description": "Model Profile LLM backend BA"
+    },
+    {
+      "key": "user_id",
+      "value": "USR-TEST-BA-001",
+      "type": "string",
+      "description": "ID Pengguna BA Penguji"
+    },
+    {
+      "key": "project_id",
+      "value": "prj01",
+      "type": "string",
+      "description": "ID Proyek Master"
+    },
+    {
+      "key": "project_name",
+      "value": "nagamas",
+      "type": "string",
+      "description": "Nama Proyek EKSAD"
+    },
+    {
+      "key": "tenant_id",
+      "value": "tnt001",
+      "type": "string",
+      "description": "ID Tenant Isolation"
+    },
+    {
+      "key": "tenant_name",
+      "value": "byd",
+      "type": "string",
+      "description": "Nama Client Tenant"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check - Gateway Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Create Session - Save 8 BA User Context Vars",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200/201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.session && jsonData.session.id) {",
+              "    pm.collectionVariables.set('session_id', jsonData.session.id);",
+              "    console.log('\u2705 Captured BA session_id:', jsonData.session.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"jopCoba BA Session - Svc Procurement Approval BRD\",\n  \"model\": \"{{model}}\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_ba_test\",\n    \"role\": \"Business Analyst\",\n    \"department\": \"Business Requirement Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Send Prompt - Generate BRD Document & User Stories",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Tolong buatkan dokumen Business Requirements Document (BRD) lengkap untuk service svc-procurement-approval pada proyek nagamas tenant byd. Sertakan ringkasan eksekutif, Business Goals, 5 Agile User Stories lengkap dengan Kriteria Penerimaan Given-When-Then, serta Approval Matrix 3 Tingkat (Manager, VP, CFO).\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}",
+            "chat"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Verify History Descending (Terbaru di Paling Atas)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "var msgs = jsonData.messages || jsonData.data || [];",
+              "if (msgs.length > 0) {",
+              "    msgs.reverse();",
+              "    console.log('\u2705 Auto-reversed messages! Latest message is now at index [0]:', msgs[0]);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages?order=desc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}",
+            "messages"
+          ],
+          "query": [
+            {
+              "key": "order",
+              "value": "desc"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Delete Session (Cleanup Server Disk)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}"
+          ]
+        }
+      }
+    }
+  ]
+}

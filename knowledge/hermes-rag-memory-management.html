@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsitektur Memory Management &amp; Integrasi Vector RAG Plugin — Hermes Agent</title>
+    <meta name="description" content="Dokumentasi Komprehensif Arsitektur Memory Management Hermes Agent: Multi-Tier Storage, Long-Term Memory (LTM), dan Integrasi Plugin Vector RAG untuk Cross-Session Knowledge Retrieval.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg: #070b14; --card: rgba(15,23,42,.75); --code: #060a12;
+            --bc: rgba(255,255,255,.07); --bhl: rgba(99,102,241,.45); --bs: rgba(255,255,255,.04);
+            --pr: #6366f1; --pl: #818cf8; --pd: rgba(99,102,241,.08);
+            --em: #10b981; --ed: rgba(16,185,129,.1);
+            --cy: #06b6d4; --cd: rgba(6,182,212,.1);
+            --am: #f59e0b; --ad: rgba(245,158,11,.1);
+            --ro: #f43f5e; --rd: rgba(244,63,94,.1);
+            --vi: #a855f7; --vd: rgba(168,85,247,.1);
+            --tm: #f1f5f9; --mu: #94a3b8; --di: #64748b; --br: #fff;
+            --fm: 'Inter',system-ui,sans-serif; --fc: 'JetBrains Mono',monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg); color: var(--tm); font-family: var(--fm); line-height: 1.7;
+            background-image: radial-gradient(ellipse at 10% 5%, rgba(99,102,241,.14) 0%, transparent 50%),
+                              radial-gradient(ellipse at 90% 80%, rgba(16,185,129,.08) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 48px 32px 100px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--bc); }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--pl); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        
+        header { margin-bottom: 44px; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3); color: var(--pl); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; background: linear-gradient(135deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .subtitle { font-size: 1.05rem; color: var(--mu); max-width: 900px; line-height: 1.8; }
+
+        .sc { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--bc); border-radius: 20px; padding: 40px; margin-bottom: 40px; }
+        .sh { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--bc); }
+        .ib { width: 48px; height: 48px; border-radius: 12px; background: var(--pd); border: 1px solid rgba(99,102,241,.3); display: flex; align-items: center; justify-content: center; color: var(--pl); font-weight: 800; font-size: 1.2rem; flex-shrink: 0; }
+        .ib.em { background: var(--ed); border-color: rgba(16,185,129,.3); color: var(--em); }
+        .ib.cy { background: var(--cd); border-color: rgba(6,182,212,.3); color: var(--cy); }
+        .ib.am { background: var(--ad); border-color: rgba(245,158,11,.3); color: var(--am); }
+        
+        h2 { font-size: 1.5rem; font-weight: 700; color: var(--br); margin-bottom: 6px; }
+        h3 { font-size: 1.15rem; font-weight: 600; color: var(--tm); margin: 20px 0 10px; }
+        p { color: var(--mu); margin-bottom: 14px; font-size: 0.94rem; line-height: 1.8; }
+        ul, ol { color: var(--mu); font-size: 0.94rem; padding-left: 22px; margin-bottom: 16px; line-height: 1.8; }
+        li { margin-bottom: 8px; }
+        li strong { color: var(--tm); }
+        code { font-family: var(--fc); background: rgba(255,255,255,.07); padding: 2px 7px; border-radius: 5px; font-size: 0.83em; color: var(--cy); }
+
+        .g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 24px 0; }
+        .ic { background: rgba(10,15,28,.7); border: 1px solid var(--bc); border-radius: 14px; padding: 22px; }
+        .ic.p { border-color: rgba(99,102,241,.3); background: var(--pd); }
+        .ic.e { border-color: rgba(16,185,129,.3); background: var(--ed); }
+        .ic.c { border-color: rgba(6,182,212,.3); background: var(--cd); }
+        .ic.a { border-color: rgba(245,158,11,.3); background: var(--ad); }
+        
+        .it { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.9rem; color: var(--br); margin-bottom: 10px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .dp { background: var(--pr); box-shadow: 0 0 6px var(--pr); }
+        .de { background: var(--em); box-shadow: 0 0 6px var(--em); }
+        .dc { background: var(--cy); box-shadow: 0 0 6px var(--cy); }
+        .da { background: var(--am); box-shadow: 0 0 6px var(--am); }
+
+        pre { background: var(--code); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 20px; font-family: var(--fc); font-size: 0.84rem; color: #e2e8f0; margin: 20px 0; line-height: 1.7; position: relative; white-space: pre-wrap; word-break: break-all; }
+        .lb { position: absolute; top: -1px; right: -1px; font-size: 0.65rem; font-weight: 700; font-family: var(--fc); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 0 12px 0 8px; background: rgba(99,102,241,.2); color: var(--pl); border: 1px solid rgba(99,102,241,.25); }
+
+        footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid var(--bc); color: var(--di); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a href="../index.html" class="back-link">&larr; Kembali ke Portal Home Hub</a>
+        <a href="hermes-gateway-integration.html" class="back-link" style="color:var(--cy)">📖 Spesifikasi Gateway Integration &rarr;</a>
+    </div>
+
+    <header>
+        <div class="badge">🧠 HERMES MEMORY &amp; RAG ARCHITECTURE</div>
+        <h1>Arsitektur Multi-Tier Storage &amp; Memory Management Plugin ke Vector RAG</h1>
+        <p class="subtitle">
+            Panduan teknis mendalam mengenai arsitektur hirarki penyimpanan (*Storage Hierarchy*) Hermes Agent pada server `203.145.34.37` dan mekanisme integrasi **Plugin Long-Term Memory (LTM) ke Vector RAG Store** untuk *Cross-Session Knowledge Retrieval*.
+        </p>
+    </header>
+
+    <!-- SECTION 1: STORAGE HIERARCHY -->
+    <section class="sc">
+        <div class="sh">
+            <div class="ib cy">💾</div>
+            <div>
+                <h2>1. Hirarki Penyimpanan &amp; Tipe Storage Hermes Agent</h2>
+                <p>EKSAD Hermes Agent menggunakan <strong>4 Tipe Storage</strong> berhirarki yang bekerja secara komplementer berdasarkan masa pakai (*lifetime*) dan kegunaannya:</p>
+            </div>
+        </div>
+
+        <div class="g4">
+            <div class="ic p">
+                <div class="it"><span class="dot dp"></span>Level 1: RAM Volatile (STM)</div>
+                <p style="font-size:0.83rem;"><strong>Short-Term Memory / Context Window</strong></p>
+                <ul style="font-size:0.82rem; padding-left:16px; margin-bottom:0;">
+                    <li><strong>Tempat:</strong> RAM Server (LLM Context Buffer).</li>
+                    <li><strong>Masa Pakai:</strong> Ephemeral (hilang saat prompt selesai / context shift).</li>
+                    <li><strong>Fungsi:</strong> Penampung pesan obrolan aktif secara real-time.</li>
+                </ul>
+            </div>
+
+            <div class="ic e">
+                <div class="it"><span class="dot de"></span>Level 2: Relational DB (LTM)</div>
+                <p style="font-size:0.83rem;"><strong>SQLite / PostgreSQL Server DB</strong></p>
+                <ul style="font-size:0.82rem; padding-left:16px; margin-bottom:0;">
+                    <li><strong>Tempat:</strong> <code>/opt/hermes/data/hermes.db</code> / Server DB.</li>
+                    <li><strong>Masa Pakai:</strong> Permanent (Survives server restart &amp; crash).</li>
+                    <li><strong>Fungsi:</strong> Menyimpan <code>sessions</code>, <code>messages</code>, <code>user_context</code> (8 vars), &amp; token usage.</li>
+                </ul>
+            </div>
+
+            <div class="ic c">
+                <div class="it"><span class="dot dc"></span>Level 3: Disk File System</div>
+                <p style="font-size:0.83rem;"><strong>Physical Disk Storage (SSD)</strong></p>
+                <ul style="font-size:0.82rem; padding-left:16px; margin-bottom:0;">
+                    <li><strong>Tempat:</strong> <code>/home/eksadpro/projects/...</code> &amp; <code>docs/</code>.</li>
+                    <li><strong>Masa Pakai:</strong> Permanent (Persisted on SSD disk).</li>
+                    <li><strong>Fungsi:</strong> Menyimpan bundel file fisik (<code>TSD_*.md</code>, <code>V1__init_*.sql</code>, <code>README.md</code>).</li>
+                </ul>
+            </div>
+
+            <div class="ic a">
+                <div class="it"><span class="dot da"></span>Level 4: Vector RAG Store</div>
+                <p style="font-size:0.83rem;"><strong>Vector DB &amp; Embeddings Store</strong></p>
+                <ul style="font-size:0.82rem; padding-left:16px; margin-bottom:0;">
+                    <li><strong>Tempat:</strong> Qdrant / PgVector / ChromaDB.</li>
+                    <li><strong>Masa Pakai:</strong> Permanent &amp; Indexed.</li>
+                    <li><strong>Fungsi:</strong> Similarity search pengetahuan &amp; ADR lintas sesi (Cross-session memory recall).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top:28px;">Matriks Penggunaan Tipe Storage Berdasarkan Kejadian (Timeline Execution)</h3>
+        <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:14px; text-align:left;">
+            <thead>
+                <tr style="background:rgba(15,23,42,0.95); color:#fff; border-bottom:1px solid var(--bc);">
+                    <th style="padding:10px 14px;">Waktu / Event Penggunaan</th>
+                    <th style="padding:10px 14px;">Tipe Storage yang Digunakan</th>
+                    <th style="padding:10px 14px;">Operasi Teknis &amp; Deskripsi Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td><code>1. POST /api/sessions</code></td>
+                    <td><span style="color:var(--em);font-weight:600;">Level 2 (Relational DB)</span></td>
+                    <td>Membuat baris cangkang baru di tabel <code>sessions</code> dan menyimpan 8 variabel <code>user_context</code>.</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td><code>2. POST /api/sessions/{id}/chat</code></td>
+                    <td><span style="color:var(--pl);font-weight:600;">Level 1 (RAM)</span> + <span style="color:var(--em);font-weight:600;">Level 2 (DB)</span></td>
+                    <td>Mengambil riwayat obrolan dari DB ke RAM Context Window, lalu menyimpan baris pesan baru ke tabel <code>messages</code>.</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td><code>3. Eksekusi Skill Generator (TSD/Flyway)</code></td>
+                    <td><span style="color:var(--cy);font-weight:600;">Level 3 (Disk SSD)</span></td>
+                    <td>Menulis file bundel fisik (<code>TSD_*.md</code>, <code>V1__init_*.sql</code>) ke folder <code>/home/eksadpro/projects/...</code>.</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td><code>4. Auto-Indexing Knowledge to RAG</code></td>
+                    <td><span style="color:var(--am);font-weight:600;">Level 4 (Vector RAG)</span></td>
+                    <td>Plugin RAG mengekstrak poin keputusan penting dari TSD/ADR, me-vectorize, dan menyimpannya ke Vector Store.</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td><code>5. Session Baru Bertanya Topik Sama</code></td>
+                    <td><span style="color:var(--am);font-weight:600;">Level 4 (Vector RAG)</span> &rarr; <span style="color:var(--pl);font-weight:600;">Level 1 (RAM)</span></td>
+                    <td>Agen melakukan similarity search via RAG API dan menginjeksi konteks jawaban dari sesi lama ke RAM agen baru.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SECTION 2: HERMES MEMORY RAG PLUGIN ARCHITECTURE -->
+    <section class="sc">
+        <div class="sh">
+            <div class="ib em">🔗</div>
+            <div>
+                <h2>2. Arsitektur Plugin Hermes Memory Management ke Vector RAG</h2>
+                <p>Bagaimana agen Hermes mengintegrasikan <strong>Stateful Session Memory</strong> ke <strong>Vector RAG Store</strong> agar pengetahuan dan keputusan arsitektur dapat di-recall oleh agen pada sesi berikutnya:</p>
+            </div>
+        </div>
+
+        <div class="mermaid" style="background:rgba(6,10,18,0.8); border:1px solid var(--bc); border-radius:12px; padding:20px; margin-bottom:24px;">
+flowchart TD
+    subgraph Client ["Client / Postman / Portal"]
+        A["POST /api/sessions/:id/chat"]
+    end
+
+    subgraph HermesCore ["Hermes Agent Core Engine"]
+        B["Stateful Session Memory (Level 2 DB)"]
+        C["Memory Sync Plugin / Extractor"]
+    end
+
+    subgraph VectorRAG ["Vector RAG Infrastructure (Level 4)"]
+        D["Text Chunking (512 tokens)"]
+        E["LLM Embedding Model (text-embedding-3-small)"]
+        F[("Vector DB (Qdrant / PgVector / Chroma)")]
+    end
+
+    subgraph CrossSession ["Future Agent Session"]
+        G["New Session Query ('Apa keputusan arsitektur project Nagamas?')"]
+        H["RAG Retrieval Skill (eksad-rag-retrieval-workflow)"]
+        I["Semantic Similarity Search (top_k=5)"]
+        J["Context Injection to Prompt Window"]
+    end
+
+    A -->|1. Store Message| B
+    B -->|2. Trigger Memory Sync| C
+    C -->|3. Extract Key Facts/ADR| D
+    D -->|4. Generate Vector| E
+    E -->|5. Store Embeddings & Metadata| F
+    G -->|6. Query| H
+    H -->|7. Vector Match| F
+    F -->|8. Relevant Context| I
+    I -->|9. Inject Context| J
+        </div>
+
+        <h3>Alur Kerja Integrasi Plugin Step-by-Step:</h3>
+        <ol>
+            <li><strong>Memory Extraction Event:</strong> Saat sesi percakapan menghasilkan deliverable penting (seperti TSD, ADR, atau Flyway Schema), Plugin Memory Hermes mengekstrak blok keputusan arsitektur.</li>
+            <li><strong>Chunking &amp; Metadata Tagging:</strong> Teks dipecah menjadi chunk berukuran 512 token dan ditandai dengan metadata isolasi: <code>user_id</code>, <code>project_id</code>, <code>tenant_id</code>, dan <code>doc_type</code>.</li>
+            <li><strong>Vector Embedding Conversion:</strong> Plugin mengirimkan chunk ke model embedding (contoh: <code>text-embedding-3-small</code>) untuk menghasilkan vektor n-dimensi (1536 dimensi).</li>
+            <li><strong>Vector DB Indexing:</strong> Embeddings disimpan ke Vector Database (PgVector / Qdrant) pada server.</li>
+            <li><strong>Cross-Session Semantic Recall:</strong> Ketika pengguna membuat sesi baru pada proyek yang sama dan mengajukan pertanyaan terkait keputusan lama, skill <code>eksad-rag-retrieval-workflow</code> memanggil RAG API untuk menyuntikkan memori secara relevan tanpa perlu mengulang instruksi dari awal.</li>
+        </ol>
+    </section>
+
+    <!-- SECTION 3: CONFIGURATION & SKILL CODE -->
+    <section class="sc">
+        <div class="sh">
+            <div class="ib am">⚙️</div>
+            <div>
+                <h2>3. Konfigurasi Plugin &amp; Skill Snippet (`eksad-rag-retrieval-workflow`)</h2>
+                <p>Konfigurasi plugin memory management pada <code>hermes-config.yaml</code> dan contoh payload pemanggilan RAG Retrieval API:</p>
+            </div>
+        </div>
+
+        <h4>Konfigurasi Plugin Memory Hermes Server (<code>/opt/hermes/config/plugin-memory-rag.yaml</code>):</h4>
+        <pre><code class="language-yaml"># /opt/hermes/config/plugin-memory-rag.yaml
+memory_plugin:
+  enabled: true
+  provider: "vector-rag-sync"
+  storage_target: "pgvector"
+  vector_db_url: "postgresql://hermes:secret@203.145.34.37:5432/hermes_vectors"
+  embedding_model: "text-embedding-3-small"
+  chunk_size: 512
+  chunk_overlap: 64
+  metadata_filters:
+    - "user_id"
+    - "project_id"
+    - "tenant_id"
+  auto_sync_on_deliverables:
+    - "TSD_DESIGN"
+    - "ADR_WORKFLOW"
+    - "FLYWAY_DDL"</code><div class="lb">yaml</div></pre>
+
+        <h4>Contoh Payload Retrieval Memory via Skill <code>eksad-rag-retrieval-workflow</code>:</h4>
+        <pre><code class="language-json">{
+  "action": "retrieve_context",
+  "query": "Berapa port dan skema otentikasi JWT yang disepakati untuk service procurement approval?",
+  "top_k": 3,
+  "filters": {
+    "project_id": "prj01",
+    "tenant_id": "tnt001"
+  }
+}</code><div class="lb json">json</div></pre>
+
+        <h4>Contoh Respon Relevant Context yang Diinjeksi ke Memory Agen:</h4>
+        <pre><code class="language-json">{
+  "status": "success",
+  "matches": [
+    {
+      "score": 0.942,
+      "source": "TSD_prj01_nagamas_svc-procurement-approval_v1.0.md",
+      "content": "Port: 8087. Auth: JWT RS256 via JWKS endpoint http://auth-service/jwks.json with @RolesAllowed authorization."
+    }
+  ]
+}</code><div class="lb json">json</div></pre>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 PT EKSAD Solusi Digital — EKSAD Agentic Knowledge &amp; Hermes Memory Infrastructure</p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+</script>
+</body>
+</html>

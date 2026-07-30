@@ -251,7 +251,7 @@ memory_plugin:
   enabled: true
   provider: "vector-rag-sync"
   storage_target: "pgvector"
-  vector_db_url: "postgresql://hermes:secret@203.145.34.37:5432/hermes_vectors"
+  vector_db_url: "postgresql://hermes:${DB_PASSWORD}@203.145.34.37:5432/hermes_vectors"
   embedding_model: "text-embedding-3-small"
   chunk_size: 512
   chunk_overlap: 64

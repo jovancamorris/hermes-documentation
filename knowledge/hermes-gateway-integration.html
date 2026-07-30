@@ -504,7 +504,7 @@
                     </tr>
                     <tr>
                         <td><strong>Bearer Token (`API_SERVER_KEY`)</strong></td>
-                        <td><code>10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9</code></td>
+                        <td><code><YOUR_API_SERVER_KEY></code></td>
                         <td>Wajib dimasukkan pada Header <code>Authorization: Bearer &lt;KEY&gt;</code></td>
                     </tr>
                 </tbody>
@@ -541,7 +541,7 @@
             <p>Membuat sesi percakapan baru di server Hermes. Mengembalikan <code>session_id</code> unik.</p>
 
 <pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions" \
-  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Session Jovan - HRIS Service TSD Design",
@@ -568,7 +568,7 @@
             <p>Mengirimkan pesan ke sesi aktif. Server otomatis mengambil konteks obrolan lama dari database (bahkan pasca server restart).</p>
 
 <pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat" \
-  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9" \
+  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>" \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Tolong buatkan skrip Flyway DDL PostgreSQL untuk modul LeaveRequest dengan 7 audit columns wajib EKSAD."
@@ -599,7 +599,7 @@
             </p>
 
 <pre><span class="lb http">cURL Request (Descending Order: Terbaru &rarr; Terlama)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages?order=desc" \
-  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
         </div>
     </div>
 
@@ -727,7 +727,7 @@ data: [DONE]</code></pre>
     const response = await fetch(`http://203.145.34.37:8643/api/sessions/${sessionId}/chat`, {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9',
+            'Authorization': 'Bearer <YOUR_API_SERVER_KEY>',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ message: userMessage, stream: true })
@@ -821,7 +821,7 @@ data: [DONE]</code></pre>
             </p>
 
 <pre><span class="lb http">cURL Request Filter Sesi (Descending Order: Terbaru &rarr; Terlama)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions?user_id=USR-TEST-001&order=desc&limit=20" \
-  -H "Authorization: Bearer 10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9"</code></pre>
+  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
         </div>
 
         <!-- 10.4 Frontend Markdown & Mermaid Rendering -->

@@ -1,0 +1,246 @@
+{
+  "info": {
+    "_postman_id": "sa-hermes-base64-image-lifecycle-zero-to-end",
+    "name": "Hermes Agent - SA Base64 Image Attach End-to-End Collection (From 0)",
+    "description": "Postman Collection murni dari 0 sampai akhir (Full Lifecycle). `session_id` awalnya kosong (blank) dan secara dinamis ditangkap dari respon Request #2 (Create Session), lalu otomatis digunakan pada Request #3 (Chat with Base64 Image), Request #4 (History Descending), dan Request #5 (Delete Session Cleanup).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://203.145.34.37:8643",
+      "type": "string",
+      "description": "Base URL API Gateway System Analyst (Port 8643)"
+    },
+    {
+      "key": "apiKey",
+      "value": "10ff9bb178374d9e1d23d1c39abcd305d3566820151b2edfd72e939290e58fe9",
+      "type": "string",
+      "description": "API_SERVER_KEY (Bearer Token Auth)"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string",
+      "description": "Session ID awalnya kosong (otomatis ter-populate saat eksekusi Request 2 Create Session)"
+    },
+    {
+      "key": "model",
+      "value": "system-analyst",
+      "type": "string",
+      "description": "Model Profile LLM backend SA (system-analyst)"
+    },
+    {
+      "key": "user_id",
+      "value": "USR-TEST-SA-B64",
+      "type": "string",
+      "description": "ID Pengguna SA Penguji"
+    },
+    {
+      "key": "project_id",
+      "value": "prj01",
+      "type": "string",
+      "description": "ID Proyek Master"
+    },
+    {
+      "key": "project_name",
+      "value": "nagamas",
+      "type": "string",
+      "description": "Nama Proyek EKSAD"
+    },
+    {
+      "key": "tenant_id",
+      "value": "tnt001",
+      "type": "string",
+      "description": "ID Tenant Isolation"
+    },
+    {
+      "key": "tenant_name",
+      "value": "byd",
+      "type": "string",
+      "description": "Nama Client Tenant"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check - Server Status Gateway",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Create Session - Generate Session ID & Save 8 SA User Context Vars",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.session && jsonData.session.id) {",
+              "    pm.collectionVariables.set('session_id', jsonData.session.id);",
+              "    console.log('\ud83d\ude80 SUCCESS: Dynamically captured session_id from 0:', jsonData.session.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"SA Base64 Diagram Session - Svc Procurement Approval TSD\",\n  \"model\": \"{{model}}\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Send Prompt with Attached Base64 Image - Generate TSD",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Tolong analisis diagram arsitektur/wireframe pada gambar Base64 berikut:\\n\\ndata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==\\n\\nBuatkan dokumen TSD (\u00a71-\u00a720) lengkap untuk service svc-procurement-approval pada proyek nagamas tenant byd.\",\n  \"image_url\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==\",\n  \"stream\": false,\n  \"user_id\": \"{user_id}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}/chat",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}",
+            "chat"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Verify & Download History Descending (Terbaru di Index [0])",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "var msgs = jsonData.messages || jsonData.data || [];",
+              "if (msgs.length > 0) {",
+              "    msgs.reverse();",
+              "    console.log('\u2705 Auto-reversed messages! Latest message is now at index [0]:', msgs[0]);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}/messages?order=desc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}",
+            "messages"
+          ],
+          "query": [
+            {
+              "key": "order",
+              "value": "desc"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Delete Session (Cleanup Server Disk)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sessions/{{session_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "sessions",
+            "{{session_id}}"
+          ]
+        }
+      }
+    }
+  ]
+}

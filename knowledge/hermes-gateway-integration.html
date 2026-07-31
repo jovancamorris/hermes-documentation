@@ -915,6 +915,23 @@ scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_na
             </div>
         </div>
 
+        <!-- Clarification Callout for Backend File Upload Responsibility -->
+        <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); border-radius:12px; padding:20px; margin-top:20px;">
+            <div style="color:var(--am); font-weight:700; font-size:0.9rem; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+                <span>⚠️ Catatan Penting Batas Tanggung Jawab Storage File (Backend vs Hermes Gateway)</span>
+            </div>
+            <p style="font-size:0.88rem; color:var(--tm); margin-bottom:8px;">
+                <strong>Apakah Hermes Agent Gateway menyediakan endpoint REST untuk menyimpan/upload file fisik (`POST /api/upload`)?</strong>
+            </p>
+            <p style="font-size:0.86rem; color:var(--mu); margin-bottom:8px;">
+                👉 <strong>TIDAK.</strong> Hermes Agent Gateway v2.3 murni bertindak sebagai <strong>AI Orchestration &amp; Stateful Chat Gateway</strong> (<code>/api/sessions</code>, <code>/v1/chat/completions</code>). Hermes Gateway <strong>belum menyediakan endpoint REST fisik khusus untuk file upload/storage management</strong>.
+            </p>
+            <ul style="font-size:0.85rem; color:var(--mu); padding-left:18px; margin-bottom:0;">
+                <li><strong>Gambar/Media Input:</strong> Diterima Hermes dalam bentuk <code>application/json</code> berisi string <strong>Base64 Data URI</strong> (misal <code>"image_url": "data:image/png;base64,..."</code>) pada endpoint <code>POST /api/sessions/{id}/chat</code> dan langsung diproses secara in-memory oleh Multimodal Vision AI.</li>
+                <li><strong>Rekomendasi Arsitektur Backend Anda:</strong> Jika sistem Anda butuh menyimpan file fisik gambar pengguna ke disk/S3, <strong>Backend Anda yang mengelola endpoint <code>POST /api/upload</code> (multipart/form-data)</strong>, lalu backend Anda mengonversi file/URL tersebut untuk dikirimkan ke Hermes Gateway.</li>
+            </ul>
+        </div>
+
         <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:20px; margin-top:24px; display:flex; align-items:center; justify-content:space-between;">
             <div>
                 <h4 style="color:#fff; margin-bottom:4px;">🧠 Dokumentasi Spesifikasi Plugin Memory Management ke Vector RAG</h4>

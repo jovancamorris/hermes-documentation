@@ -1,0 +1,584 @@
+{
+  "info": {
+    "_postman_id": "hermes-gateway-sa-official-v1",
+    "name": "Hermes Gateway API Collection - System Analyst",
+    "description": "Postman Collection resmi yang dibuat dari 0 (scratch) untuk EKSAD System Analyst Agent Gateway API (Profile `system-analyst`).\n\nBase URL: https://api-ai.eksad.com/sa\nAuth: Bearer Token (b96600cdb7d6c1b74698267ae40be861fbcea5ba1a40b0ab23bf02d60492c616)\n\nMencakup 4 Folder Utama: (1) Health & Discovery, (2) OpenAI Chat Completions API, (3) Native Stateful Session Lifecycle APIs (/api/sessions), dan (4) 5 Skenario Perancangan Dokumen System Analyst (TSD \u00a71-\u00a720, Flyway DDL PostgreSQL 7 audit columns, REST API Specs @RolesAllowed, RabbitMQ Event Schemas, dan STRIDE AppSec Threat Modeling).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "HERMES_BASE_URL",
+      "value": "https://api-ai.eksad.com/sa",
+      "type": "string",
+      "description": "Base URL Gateway Production System Analyst"
+    },
+    {
+      "key": "HERMES_API_KEY",
+      "value": "b96600cdb7d6c1b74698267ae40be861fbcea5ba1a40b0ab23bf02d60492c616",
+      "type": "string",
+      "description": "Bearer Token Authentication Key SA"
+    },
+    {
+      "key": "HERMES_MODEL",
+      "value": "system-analyst",
+      "type": "string",
+      "description": "Model Profile SA"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string",
+      "description": "Session ID aktif SA (otomatis ter-populate saat Create Session)"
+    },
+    {
+      "key": "user_id",
+      "value": "USR-TEST-SA-001",
+      "type": "string",
+      "description": "ID Pengguna System Analyst Penguji"
+    },
+    {
+      "key": "project_id",
+      "value": "prj01",
+      "type": "string",
+      "description": "ID Proyek Master"
+    },
+    {
+      "key": "project_name",
+      "value": "nagamas",
+      "type": "string",
+      "description": "Nama Proyek EKSAD"
+    },
+    {
+      "key": "tenant_id",
+      "value": "tnt001",
+      "type": "string",
+      "description": "ID Tenant Isolation"
+    },
+    {
+      "key": "tenant_name",
+      "value": "byd",
+      "type": "string",
+      "description": "Nama Client Tenant"
+    }
+  ],
+  "item": [
+    {
+      "name": "\ud83d\ude80 1. Health & Discovery",
+      "item": [
+        {
+          "name": "1.1 Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/health",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.2 Detailed Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/health?detail=true",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ],
+              "query": [
+                {
+                  "key": "detail",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 List Supported Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/models",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "models"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\u26a1 2. OpenAI Chat Completions API",
+      "item": [
+        {
+          "name": "2.1 Create Chat Completion (System Analyst Intro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{HERMES_MODEL}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Perkenalkan diri dan jelaskan tugas utama Anda.\"\n    }\n  ],\n  \"stream\": false\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.2 Streaming Chat Completion SSE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{HERMES_MODEL}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Jelaskan standar audit column Flyway DDL PostgreSQL pada arsitektur EKSAD.\"\n    }\n  ],\n  \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83e\uddea 3. Native Stateful Session Lifecycle APIs (/api/sessions)",
+      "item": [
+        {
+          "name": "3.1 Create SA Session (Save Title & 8 SA User Context Vars)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 201', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.session && jsonData.session.id) {",
+                  "    pm.collectionVariables.set('session_id', jsonData.session.id);",
+                  "    console.log('\ud83d\ude80 SUCCESS: Dynamically captured SA session_id:', jsonData.session.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"SA Architecture Session - Svc Procurement Approval TSD\",\n  \"model\": \"{{HERMES_MODEL}}\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_context\": {\n    \"user_id\": \"{{user_id}}\",\n    \"username\": \"jovan_sa_test\",\n    \"role\": \"System Analyst\",\n    \"department\": \"IT Architecture Team\",\n    \"project_id\": \"{{project_id}}\",\n    \"project_name\": \"{{project_name}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"tenant_name\": \"{{tenant_name}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.2 Send SA Chat Prompt (Generate TSD & Flyway DDL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Buatkan dokumen TSD (\u00a71-\u00a720) lengkap dan skrip Flyway DDL PostgreSQL (7 audit cols: tenant_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by) untuk service svc-procurement-approval pada proyek nagamas tenant byd.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.3 Get SA Messages History Descending (Terbaru di Index [0])",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "var msgs = jsonData.messages || jsonData.data || [];",
+                  "if (msgs.length > 0) {",
+                  "    msgs.reverse();",
+                  "    console.log('\u2705 Auto-reversed messages! Latest message is at index [0]:', msgs[0]);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/messages?order=desc",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "messages"
+              ],
+              "query": [
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.4 List Active SA Sessions Filtered",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions?user_id={{user_id}}&order=desc&limit=20",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.5 Delete SA Session (Cleanup Server Disk)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcd1 4. System Analyst Document Generation Scenarios",
+      "item": [
+        {
+          "name": "4.1 Scenario 1 - Full Technical Specification Document (TSD) \u00a71-\u00a720 Generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Buatkan dokumen TSD (Technical Specification Document) \u00a71-\u00a720 lengkap untuk microservice svc-procurement-approval pada proyek nagamas tenant byd. Sertakan System Architecture Diagram, Sequence Diagram, Database Schema ERD, REST API Endpoint Specs (@RolesAllowed), RabbitMQ Event Envelope Specs, dan STRIDE Threat Modeling.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.2 Scenario 2 - Flyway DDL PostgreSQL Database Migration (7 Audit Columns)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Buatkan skrip Flyway DDL PostgreSQL singkat V1__init_procurement_tables.sql untuk tabel procurement_requests dan procurement_approvals. Wajib sertakan 7 audit columns EKSAD: tenant_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by beserta Foreign Keys dan Indexes yang tepat.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.3 Scenario 3 - REST API Endpoint Catalog & RBAC Security Specs (@RolesAllowed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Rancang katalog REST API Specification lengkap untuk service procurement (POST /api/v1/procurement-requests, GET /api/v1/procurement-requests/{id}, POST /api/v1/procurement-requests/{id}/approve). Sertakan proteksi RBAC `@RolesAllowed({'PROCUREMENT_MAKER', 'PROCUREMENT_CHECKER', 'PROCUREMENT_APPROVER'})`, struktur JSON Request/Response, dan Error Handling HTTP status codes.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.4 Scenario 4 - RabbitMQ Async Event Schemas & Exchange Architecture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Rancang arsitektur event-driven RabbitMQ dan JSON Event Envelope Schema untuk event `procurement.request.created` dan `procurement.request.approved`. Sertakan nama Exchange (`exc-procurement`), Routing Key (`procurement.event.created`), Dead Letter Queue (DLQ), dan struktur JSON Payload.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.5 Scenario 5 - AppSec STRIDE Threat Modeling & Vulnerability Mitigation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Buatkan matriks AppSec STRIDE Threat Modeling lengkap (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) untuk service procurement approval beserta strategi mitigasi teknisnya.\",\n  \"stream\": false,\n  \"user_id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

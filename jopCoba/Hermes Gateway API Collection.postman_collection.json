@@ -1,0 +1,155 @@
+{
+  "info": {
+    "_postman_id": "d5233ffb-29fa-4045-9f89-d662edd793ee",
+    "name": "Hermes Gateway API Collection",
+    "description": "Postman collection for the Hermes Agent Gateway API Server (Hermes Agent v0.19.0 (2026.7.20), upstream 8c36cd46, profile `business-analyst`).\n\nBase URL: https://api-ai.eksad.com/ba\nAuth: Bearer token using API_SERVER_KEY (b96600cdb7d6c1b74698267ae40be861fbcea5ba1a40b0ab23bf02d60492c615)\n\nKhusus untuk EKSAD Business Analyst Agent: Penulisan & Review BRD/FSD, User Stories & Acceptance Criteria Given-When-Then, Business Process Flow & Approval Matrix.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "HERMES_BASE_URL",
+      "value": "https://api-ai.eksad.com/ba",
+      "type": "string",
+      "description": "Base URL Gateway Production Business Analyst"
+    },
+    {
+      "key": "HERMES_API_KEY",
+      "value": "b96600cdb7d6c1b74698267ae40be861fbcea5ba1a40b0ab23bf02d60492c615",
+      "type": "string",
+      "description": "Bearer Token Authentication Key BA"
+    },
+    {
+      "key": "HERMES_MODEL",
+      "value": "business-analyst",
+      "type": "string",
+      "description": "Model Profile BA"
+    },
+    {
+      "key": "session_id",
+      "value": "ba-analysis-001",
+      "type": "string",
+      "description": "Session ID aktif BA"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Discovery",
+      "item": [
+        {
+          "name": "1.1 Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/health",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.2 List Supported Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/models",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "models"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. OpenAI Chat Completions API",
+      "item": [
+        {
+          "name": "2.1 Create Chat Completion (Business Analyst Intro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{HERMES_MODEL}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Perkenalkan diri dan jelaskan tugas utama Anda sebagai Business Analyst.\"\n    }\n  ],\n  \"stream\": false\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Native Stateful Session Lifecycle APIs (/api/sessions)",
+      "item": [
+        {
+          "name": "3.1 Create BA Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{HERMES_API_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"BA Requirements Session - Svc Procurement BRD\",\n  \"model\": \"{{HERMES_MODEL}}\",\n  \"user_id\": \"USR-TEST-BA-001\",\n  \"user_context\": {\n    \"user_id\": \"USR-TEST-BA-001\",\n    \"username\": \"jovan_ba_test\",\n    \"role\": \"Business Analyst\",\n    \"department\": \"Business Requirement Team\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

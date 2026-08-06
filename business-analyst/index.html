@@ -474,12 +474,12 @@
 
     <!-- Section 3: Detailed Request & Response JSON Code Examples -->
     <section class="section-card">
-        <h2>Contoh Payload Request &amp; Response JSON per Endpoint</h2>
-        <p>Contoh nyata format JSON Request Payload dan Response Payload yang dikembalikan oleh Gateway Business Analyst (Port 8642):</p>
+        <h2>Contoh Payload Request &amp; Response JSON Lengkap per Endpoint (Business Analyst Gateway - Port 8642)</h2>
+        <p>Format nyata JSON Request Payload dan Response Payload (termasuk status 200 OK, 201 Created, SSE streaming, &amp; 400/404/500 error contracts) yang dikembalikan oleh Gateway Business Analyst (Port 8642):</p>
 
         <!-- Request 1 -->
         <div class="req-card">
-            <div class="req-title">1. GET /v1/models (Health Check)</div>
+            <div class="req-title">1. GET /v1/models (Model Discovery &amp; Server Health Check)</div>
 <pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
   "object": "list",
   "data": [
@@ -488,7 +488,7 @@
       "object": "model",
       "created": 1785212000,
       "owned_by": "eksad-hermes-gateway",
-      "meta": { "provider": "Anthropic", "model_name": "claude-sonnet-4", "port": 8642 }
+      "meta": { "provider": "Anthropic", "model_name": "claude-sonnet-4", "port": 8642, "role": "Business Analyst" }
     }
   ]
 }</code></pre>
@@ -496,7 +496,7 @@
 
         <!-- Request 2 -->
         <div class="req-card">
-            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat)</div>
+            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat - OpenAI Compatible)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
   "model": "business-analyst",
   "messages": [
@@ -523,47 +523,126 @@
 
         <!-- Request 3 -->
         <div class="req-card">
-            <div class="req-title">3. POST /api/sessions (Create New Session)</div>
+            <div class="req-title">3. POST /api/sessions (Create New Stateful Session)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
   "title": "Session BA - Procurement Workflow BRD Analysis",
   "model": "business-analyst",
-  "user_context": { "user_id": "USR-88201", "username": "sarah_ba", "role": "Business Analyst" }
+  "user_id": "USR-88201",
+  "user_context": { 
+    "user_id": "USR-88201", 
+    "username": "sarah_ba", 
+    "role": "Business Analyst",
+    "domain": "Procurement & Supply Chain",
+    "document_type": "BRD / FSD"
+  }
 }</code></pre>
 <pre><span class="code-label lbl-res">JSON Response (201 Created)</span><code>{
   "status": "success",
   "session_id": "api_ba_1785212211_99aa",
   "title": "Session BA - Procurement Workflow BRD Analysis",
-  "created_at": 1785212211
+  "user_id": "USR-88201",
+  "created_at": "2026-08-06T14:32:00Z"
 }</code></pre>
         </div>
 
         <!-- Request 4 -->
         <div class="req-card">
-            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session)</div>
+            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session - Non Stream)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
-  "message": "Tolong buatkan User Story dan Acceptance Criteria (format Given-When-Then) untuk modul Approval Matrix pada E-Procurement.",
-  "user_context": { "user_id": "USR-88201" }
+  "message": "Tolong buatkan User Story dan Acceptance Criteria format Given-When-Then untuk fitur persetujuan pengajuan barang (Procurement Approval).",
+  "stream": false,
+  "user_id": "USR-88201"
 }</code></pre>
 <pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "object": "hermes.session.chat.completion",
   "session_id": "api_ba_1785212211_99aa",
-  "message_id": "msg_ba_00192",
-  "role": "assistant",
-  "content": "### User Story: E-Procurement Approval Matrix\n\n**As a** Finance Manager,\n**I want to** approve procurement requests exceeding 100M IDR,\n**So that** high-value purchases comply with corporate governance.\n\n### Acceptance Criteria:\n- **Given** a procurement request worth 150M IDR,\n- **When** the Finance Manager submits the approval form,\n- **Then** the status changes to APPROVED and a notification event is sent to RabbitMQ.",
-  "usage": { "prompt_tokens": 1120, "completion_tokens": 420, "total_tokens": 1540 }
+  "message_id": "msg_ba_7721",
+  "message": {
+    "role": "assistant",
+    "content": "### User Story: Approval Procurement Request\n\n**As a** Department Manager\n**I want to** approve or reject procurement requests directly from web portal\n**So that** procurement items can be processed swiftly.\n\n**Acceptance Criteria (Given-When-Then):**\n- **Scenario 1: Manager Approve Request**\n  - **Given** Manager membuka antrean pengajuan 'PENDING_APPROVAL'\n  - **When** Manager menekan tombol 'Approve' dan memberikan catatan\n  - **Then** Status pengajuan berubah menjadi 'APPROVED' dan notifikasi dikirim ke Purchasing."
+  },
+  "usage": { "prompt_tokens": 310, "completion_tokens": 420, "total_tokens": 730 }
 }</code></pre>
         </div>
 
         <!-- Request 5 -->
         <div class="req-card">
-            <div class="req-title">5. GET /api/sessions/{session_id}/messages (Get Session Messages History)</div>
-<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+            <div class="req-title">5. POST /api/sessions/{session_id}/chat (Real-Time SSE Streaming - stream: true)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "message": "Buatkan matriks persetujuan berjenjang (Approval Matrix L1 - L3) berdasarkan nominal rupiah pengajuan.",
+  "stream": true,
+  "user_id": "USR-88201"
+}</code></pre>
+<pre><span class="code-label lbl-res">Server Response Stream Chunks (text/event-stream)</span><code>data: {"id":"msg_ba_7722","choices":[{"delta":{"role":"assistant"}}]}
+
+data: {"id":"msg_ba_7722","choices":[{"delta":{"content":"### Approval Matrix L1 - L3\n1. < Rp 10 Juta: Manager Approval\n2. Rp 10-50 Juta: GM Approval\n3. > Rp 50 Juta: Director Approval"}}]}
+
+data: [DONE]</code></pre>
+        </div>
+
+        <!-- Request 6 -->
+        <div class="req-card">
+            <div class="req-title">6. GET /api/sessions/{session_id}/messages?order=desc (Get Session Messages History)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK - Sorted Descending: Terbaru &rarr; Terlama)</span><code>{
   "session_id": "api_ba_1785212211_99aa",
   "total_messages": 2,
-  "accumulated_usage": { "total_prompt_tokens": 1215, "total_completion_tokens": 580, "total_tokens": 1795 },
+  "order": "desc",
   "messages": [
-    { "id": "msg_1", "role": "user", "content": "Tolong buatkan User Story...", "timestamp": 1785212211 },
-    { "id": "msg_2", "role": "assistant", "content": "### User Story: E-Procurement Approval Matrix...", "timestamp": 1785212215 }
+    { 
+      "id": "msg_ba_7721", 
+      "role": "assistant", 
+      "content": "### User Story: Approval Procurement Request...", 
+      "timestamp": "2026-08-06T14:33:10Z" 
+    },
+    { 
+      "id": "msg_ba_7720", 
+      "role": "user", 
+      "content": "Tolong buatkan User Story dan Acceptance Criteria...", 
+      "timestamp": "2026-08-06T14:33:05Z" 
+    }
   ]
+}</code></pre>
+        </div>
+
+        <!-- Request 7 -->
+        <div class="req-card">
+            <div class="req-title">7. GET /api/sessions?user_id={user_id}&amp;order=desc (List Active Sessions Filtered)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "status": "success",
+  "total": 1,
+  "user_id": "USR-88201",
+  "sessions": [
+    {
+      "session_id": "api_ba_1785212211_99aa",
+      "title": "Session BA - Procurement Workflow BRD Analysis",
+      "message_count": 4,
+      "created_at": "2026-08-06T14:32:00Z",
+      "updated_at": "2026-08-06T14:35:10Z"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- Request 8 -->
+        <div class="req-card">
+            <div class="req-title">8. DELETE /api/sessions/{session_id} (Delete Session)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "status": "success",
+  "message": "Session api_ba_1785212211_99aa has been deleted successfully",
+  "session_id": "api_ba_1785212211_99aa"
+}</code></pre>
+        </div>
+
+        <!-- Request 9 -->
+        <div class="req-card">
+            <div class="req-title">9. Standard Error JSON Contract (400 Bad Request / 401 / 404 / 500)</div>
+<pre><span class="code-label lbl-res">JSON Error Response (404 Not Found / 401 Unauthorized)</span><code>{
+  "error": {
+    "code": "SESSION_NOT_FOUND",
+    "message": "Session ID 'api_ba_9999' not found on Hermes Gateway server",
+    "status": 404,
+    "timestamp": "2026-08-06T14:45:00Z"
+  }
 }</code></pre>
         </div>
     </section>

@@ -527,27 +527,239 @@
         <div class="sh">
             <div class="ib bc2">⚡</div>
             <div class="stg">
-                <h2>7. API Endpoint Contracts &amp; Code Examples</h2>
-                <p>Spesifikasi teknis cURL request &amp; JSON response per endpoint.</p>
+                <h2>7. API Endpoint Contracts &amp; Specification (Fungsi, Parameter Required, &amp; Response JSON)</h2>
+                <p>Spesifikasi teknis mendalam mencakup <strong>Fungsi Endpoint</strong>, <strong>Parameter Wajib (Required) vs Opsional</strong>, <strong>cURL Request</strong>, serta <strong>JSON Response Payload (Status 200, 201, SSE Streaming, &amp; Error Contracts)</strong> untuk setiap endpoint Hermes Gateway (Port 8642 BA / Port 8643 SA).</p>
             </div>
         </div>
 
-        <!-- 7.1 Create Session -->
+        <!-- 7.1 Health Check -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#0284c7">GET</span>
+                <h3>7.1 Server Health Check (`GET /health` atau `GET /v1/health`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Memeriksa status kesehatan server Hermes Agent Gateway, versi aplikasi, port gateway aktif, dan jumlah total sesi percakapan yang sedang berjalan.</p>
+            
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>Authorization</code></td>
+                        <td style="padding:8px 12px;">Header</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Bearer Token API Server Key (misal: <code>Bearer YOUR_API_SERVER_KEY</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X GET "http://203.145.34.37:8643/health"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "status": "healthy",
+  "service": "hermes-gateway",
+  "version": "2.3.0",
+  "timestamp": "2026-08-06T14:30:00Z",
+  "active_sessions_count": 14,
+  "gateway_port": 8643
+}</code></pre>
+        </div>
+
+        <!-- 7.2 Model Discovery -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#0284c7">GET</span>
+                <h3>7.2 Discovery Models (`GET /v1/models`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengidentifikasi profil AI Agent yang terinstal dan aktif di server Hermes (kompatibel dengan spesifikasi OpenAI Model List).</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>Authorization</code></td>
+                        <td style="padding:8px 12px;">Header</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Bearer Token API Key (misal: <code>Bearer YOUR_API_SERVER_KEY</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X GET "http://203.145.34.37:8643/v1/models"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "object": "list",
+  "data": [
+    {
+      "id": "system-analyst",
+      "object": "model",
+      "created": 1785212000,
+      "owned_by": "eksad-hermes-gateway",
+      "meta": { "provider": "MiniMax", "model_name": "MiniMax-M2", "role": "System Analyst", "port": 8643 }
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- 7.3 Stateless Chat Completion -->
         <div class="ss">
             <div class="ssh">
                 <span class="sn">POST</span>
-                <h3>7.1 Create New Session (`/api/sessions`)</h3>
+                <h3>7.3 Stateless Chat Completion (`POST /v1/chat/completions`)</h3>
             </div>
-            <p>Membuat sesi percakapan baru di server Hermes. Mengembalikan <code>session_id</code> unik.</p>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengirim instruksi percakapan sekali jalan tanpa menyimpan sesi di server (Stateless Mode). Mengembalikan respon teks dari AI secara instan.</p>
 
-<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions" \
-  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>" \
-  -H "Content-Type: application/json" \
-  -d '{
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>Authorization</code></td>
+                        <td style="padding:8px 12px;">Header</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Bearer Token API Key (misal: <code>Bearer YOUR_API_SERVER_KEY</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>model</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Model AI (misal: <code>"system-analyst"</code> atau <code>"business-analyst"</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>messages</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Array of Object</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Daftar pesan percakapan (minimal 1 item dengan <code>role</code> &amp; <code>content</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_context</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Object</td>
+                        <td style="padding:8px 12px;"><span style="color:#10b981; font-weight:700">RECOMMENDED</span></td>
+                        <td style="padding:8px 12px;">Metadata konteks pengguna (misal: <code>{"user_id": "USR-10293", "role": "System Analyst"}</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/v1/chat/completions"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"   -H "Content-Type: application/json"   -d '{
+    "model": "system-analyst",
+    "messages": [
+      { "role": "system", "content": "Anda adalah Agent System Analyst EKSAD." },
+      { "role": "user", "content": "Tolong buatkan outline TSD singkat untuk microservice svc-user-management." }
+    ],
+    "user_context": { "user_id": "USR-10293", "role": "System Analyst" }
+  }'</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "id": "chatcmpl-98123456",
+  "object": "chat.completion",
+  "created": 1785212015,
+  "model": "system-analyst",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "### TSD Blueprint: svc-user-management\n\n1. Stack: Quarkus 3.30.6 Reactive\n2. DB: PostgreSQL db_user\n3. Messaging: RabbitMQ Topic Broker"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": { "prompt_tokens": 125, "completion_tokens": 280, "total_tokens": 405 }
+}</code></pre>
+        </div>
+
+        <!-- 7.4 Create New Session -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">POST</span>
+                <h3>7.4 Create New Stateful Session (`POST /api/sessions`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Inisialisasi percakapan berulang (Stateful Session). Server membuat <code>session_id</code> baru dan menyimpan konteks profil pengguna (<code>user_context</code>) ke database Hermes server.</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>Authorization</code></td>
+                        <td style="padding:8px 12px;">Header</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Bearer Token API Key (misal: <code>Bearer YOUR_API_SERVER_KEY</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>title</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Judul nama sesi obrolan (misal: <code>"Session Jovan - HRIS TSD"</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_id</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Unik Pengguna / Dev (misal: <code>"USR-10293"</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>model</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#0284c7; font-weight:700">OPTIONAL</span></td>
+                        <td style="padding:8px 12px;">Target model profil (default: <code>"system-analyst"</code> atau <code>"business-analyst"</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_context</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Object</td>
+                        <td style="padding:8px 12px;"><span style="color:#10b981; font-weight:700">RECOMMENDED</span></td>
+                        <td style="padding:8px 12px;">Kumpulan variabel profil (role, DB type, messaging, framework)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"   -H "Content-Type: application/json"   -d '{
     "title": "Session Jovan - HRIS Service TSD Design",
+    "model": "system-analyst",
+    "user_id": "USR-10293",
     "user_context": {
       "user_id": "USR-10293",
-      "role": "System Analyst"
+      "username": "jovan_sa",
+      "role": "System Analyst",
+      "db_type": "PostgreSQL",
+      "messaging": "RabbitMQ",
+      "framework": "Quarkus 3.30.6 Reactive"
     }
   }'</code></pre>
 
@@ -555,61 +767,387 @@
   "status": "success",
   "session_id": "api_1785212211_12b5637c",
   "title": "Session Jovan - HRIS Service TSD Design",
-  "created_at": 1785212211
+  "user_id": "USR-10293",
+  "created_at": "2026-08-06T14:32:00Z"
 }</code></pre>
         </div>
 
-        <!-- 7.2 Send Chat -->
+        <!-- 7.5 Send Chat Non-Streaming -->
         <div class="ss">
             <div class="ssh">
                 <span class="sn">POST</span>
-                <h3>7.2 Send Chat to Session (`/api/sessions/{session_id}/chat`)</h3>
+                <h3>7.5 Send Chat to Session (Non-Streaming) (`POST /api/sessions/{session_id}/chat`)</h3>
             </div>
-            <p>Mengirimkan pesan ke sesi aktif. Server otomatis mengambil konteks obrolan lama dari database (bahkan pasca server restart).</p>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengirimkan pesan baru ke sesi percakapan aktif. Server otomatis mengambil riwayat konteks obrolan terdahulu dari database dan mengembalikan jawaban utuh dalam satu payload JSON.</p>
 
-<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat" \
-  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Tolong buatkan skrip Flyway DDL PostgreSQL untuk modul LeaveRequest dengan 7 audit columns wajib EKSAD."
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>session_id</code></td>
+                        <td style="padding:8px 12px;">URL Path</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Sesi aktif di URL (misal: <code>/api/sessions/api_1785212211_12b5637c/chat</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>message</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Isi pesan / prompt dari pengguna (misal: <code>"Tolong buatkan DDL Flyway SQL..."</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_id</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Pengguna pengirim pesan (misal: <code>"USR-10293"</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>stream</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Boolean</td>
+                        <td style="padding:8px 12px;"><span style="color:#0284c7; font-weight:700">OPTIONAL</span></td>
+                        <td style="padding:8px 12px;">Mode respon (set <code>false</code> untuk non-streaming; default: <code>false</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"   -H "Content-Type: application/json"   -d '{
+    "message": "Tolong buatkan skrip Flyway DDL PostgreSQL untuk modul LeaveRequest dengan 7 audit columns wajib EKSAD.",
+    "stream": false,
+    "user_id": "USR-10293"
   }'</code></pre>
 
 <pre><span class="lb json">200 OK Response</span><code>{
+  "object": "hermes.session.chat.completion",
   "session_id": "api_1785212211_12b5637c",
   "message_id": "msg_998231",
-  "role": "assistant",
-  "content": "Berikut adalah skrip Flyway DDL V1__init_hris_schema.sql...\n\nCREATE TABLE hris_leave_request (...",
-  "usage": {
-    "prompt_tokens": 1420,
-    "completion_tokens": 530,
-    "total_tokens": 1950
+  "message": {
+    "role": "assistant",
+    "content": "Berikut adalah skrip Flyway DDL V1__init_hris_leave_request.sql:\n\nCREATE TABLE hris_leave_request (\n    id VARCHAR(36) PRIMARY KEY,\n    created_by VARCHAR(50) NOT NULL\n);"
   },
-  "created_at": 1785212215
+  "usage": { "prompt_tokens": 1420, "completion_tokens": 530, "total_tokens": 1950 },
+  "created_at": "2026-08-06T14:33:10Z"
 }</code></pre>
         </div>
 
-        <!-- 7.3 Get History -->
+        <!-- 7.6 Real-Time SSE Streaming -->
         <div class="ss">
             <div class="ssh">
-                <span class="sn">GET</span>
-                <h3>7.3 Get Session Messages History (`/api/sessions/{session_id}/messages?order=desc`)</h3>
+                <span class="sn">POST</span>
+                <h3>7.6 Real-Time SSE Streaming Chat (`POST /api/sessions/{session_id}/chat` stream=true)</h3>
             </div>
-            <p>
-                Mengambil seluruh rekam jejak obrolan dan akumulasi pemakaian token dari database server. Tambahkan parameter <code>?order=desc</code> untuk mengurutkan pesan dari **yang Paling Baru (Terbaru) ke yang Paling Lama (Terlama)**.
-            </p>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengirimkan pesan dengan respon streaming karakter demi karakter (typing animation) secara real-time via protokol <code>text/event-stream</code>.</p>
 
-<pre><span class="lb http">cURL Request (Descending Order: Terbaru &rarr; Terlama)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages?order=desc" \
-  -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>stream</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Boolean</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Must set to <code>true</code> untuk mengaktifkan Server-Sent Events (SSE)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>message</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Prompt teks yang ingin diproses oleh AI Agent</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_id</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Unik Pengguna</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request (Stream Mode)</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"   -H "Content-Type: application/json"   -d '{
+    "message": "Buatkan REST API endpoint list untuk modul leave request.",
+    "stream": true,
+    "user_id": "USR-10293"
+  }'</code></pre>
+
+<pre><span class="lb py">200 OK Response Stream Chunks (text/event-stream)</span><code>data: {"id":"msg_101","choices":[{"delta":{"role":"assistant"}}]}
+
+data: {"id":"msg_101","choices":[{"delta":{"content":"Berikut "}}]}
+
+data: {"id":"msg_101","choices":[{"delta":{"content":"adalah 3 REST API endpoint..."}}]}
+
+data: [DONE]</code></pre>
+        </div>
+
+        <!-- 7.7 Get Session History -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#0284c7">GET</span>
+                <h3>7.7 Get Session Messages History (`GET /api/sessions/{session_id}/messages?order=desc`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengambil rekam jejak obrolan dalam satu sesi. Dengan menambahkan query parameter <code>?order=desc</code>, urutan pesan akan disajikan dari <strong>Paling Baru (Index [0]) ke Paling Lama</strong> (cocok untuk komponen UI Chat Web Portal).</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>session_id</code></td>
+                        <td style="padding:8px 12px;">URL Path</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Sesi target (misal: <code>api_1785212211_12b5637c</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>order</code></td>
+                        <td style="padding:8px 12px;">URL Query</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#0284c7; font-weight:700">OPTIONAL</span></td>
+                        <td style="padding:8px 12px;">Set <code>"desc"</code> untuk urutan pesan terbaru di atas (default: <code>"asc"</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request (Descending Order)</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/messages?order=desc"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+
+<pre><span class="lb json">200 OK Response (Sorted Descending)</span><code>{
+  "session_id": "api_1785212211_12b5637c",
+  "total_messages": 2,
+  "order": "desc",
+  "messages": [
+    {
+      "id": "msg_998231",
+      "role": "assistant",
+      "content": "Berikut adalah skrip Flyway DDL V1__init_hris_leave_request.sql...",
+      "timestamp": "2026-08-06T14:33:10Z"
+    },
+    {
+      "id": "msg_998230",
+      "role": "user",
+      "content": "Tolong buatkan skrip Flyway DDL PostgreSQL untuk modul LeaveRequest...",
+      "timestamp": "2026-08-06T14:33:05Z"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- 7.8 List Active Sessions Filtered -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#0284c7">GET</span>
+                <h3>7.8 List Active Sessions Filtered (`GET /api/sessions?user_id={user_id}&amp;order=desc`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Menampilkan daftar sesi aktif yang dibuat oleh pengguna tertentu untuk merender menu sidebar di Web Portal EKSAD.</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_id</code></td>
+                        <td style="padding:8px 12px;">URL Query</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Filter ID Pengguna (misal: <code>?user_id=USR-10293</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>order</code></td>
+                        <td style="padding:8px 12px;">URL Query</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#0284c7; font-weight:700">OPTIONAL</span></td>
+                        <td style="padding:8px 12px;">Set <code>"desc"</code> untuk urutan sesi terbaru di posisi atas</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X GET "http://203.145.34.37:8643/api/sessions?user_id=USR-10293&amp;order=desc"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "status": "success",
+  "total": 2,
+  "user_id": "USR-10293",
+  "sessions": [
+    {
+      "session_id": "api_1785212211_12b5637c",
+      "title": "Session Jovan - HRIS Service TSD Design",
+      "message_count": 4,
+      "created_at": "2026-08-06T14:32:00Z",
+      "updated_at": "2026-08-06T14:35:10Z"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- 7.9 Delete Session -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#e11d48">DELETE</span>
+                <h3>7.9 Delete Session &amp; Storage Cleanup (`DELETE /api/sessions/{session_id}`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Menghapus secara permanen sesi obrolan dari database Hermes server dan membersihkan memori terkait.</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>session_id</code></td>
+                        <td style="padding:8px 12px;">URL Path</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Sesi yang ingin dihapus (misal: <code>api_1785212211_12b5637c</code>)</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X DELETE "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "status": "success",
+  "message": "Session api_1785212211_12b5637c has been deleted successfully",
+  "session_id": "api_1785212211_12b5637c",
+  "deleted_at": "2026-08-06T14:40:00Z"
+}</code></pre>
+        </div>
+
+        <!-- 7.10 Vision Base64 Image Attachment -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn">POST</span>
+                <h3>7.10 Multi-Modal Vision / Base64 Image Attachment (`POST /api/sessions/{session_id}/chat` with `images`)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Mengirimkan instruksi yang dilampiri gambar arsitektur / diagram / screenshot UI dalam format string <code>base64</code> untuk dianalisis oleh AI Vision engine Hermes.</p>
+
+            <div style="margin: 12px 0;">
+                <h4 style="color:#fff; font-size: 0.95rem; margin-bottom: 6px;">📌 Tabel Parameter Request:</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; background:rgba(0,0,0,0.2); border-radius:8px; overflow:hidden;">
+                    <tr style="background:rgba(255,255,255,0.05); color:#fff; text-align:left;">
+                        <th style="padding:8px 12px;">Parameter / Header</th>
+                        <th style="padding:8px 12px;">Lokasi</th>
+                        <th style="padding:8px 12px;">Tipe Data</th>
+                        <th style="padding:8px 12px;">Status</th>
+                        <th style="padding:8px 12px;">Keterangan &amp; Contoh</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>message</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Instruksi analisis gambar (misal: <code>"Analisa diagram arsitektur ini..."</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>images</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">Array of String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">Array string Base64 gambar (misal: <code>["data:image/png;base64,iVBOR..."]</code>)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <td style="padding:8px 12px;"><code>user_id</code></td>
+                        <td style="padding:8px 12px;">Body JSON</td>
+                        <td style="padding:8px 12px;">String</td>
+                        <td style="padding:8px 12px;"><span style="color:#ef4444; font-weight:700">REQUIRED</span></td>
+                        <td style="padding:8px 12px;">ID Unik Pengguna</td>
+                    </tr>
+                </table>
+            </div>
+
+<pre><span class="lb http">cURL Request</span><code>curl -X POST "http://203.145.34.37:8643/api/sessions/api_1785212211_12b5637c/chat"   -H "Authorization: Bearer <YOUR_API_SERVER_KEY>"   -H "Content-Type: application/json"   -d '{
+    "message": "Tolong analisa diagram arsitektur sistem berikut ini dan buatkan spesifikasi TSD-nya.",
+    "images": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+    ],
+    "user_id": "USR-10293"
+  }'</code></pre>
+
+<pre><span class="lb json">200 OK Response</span><code>{
+  "object": "hermes.session.chat.completion",
+  "session_id": "api_1785212211_12b5637c",
+  "message_id": "msg_998245",
+  "message": {
+    "role": "assistant",
+    "content": "Hasil Analisis Gambar Arsitektur:\n1. Terdapat 3 komponen utama: API Gateway, Microservice Core, dan PostgreSQL DB...\n2. Rekomendasi perbaikan: Tambahkan RabbitMQ Message Broker..."
+  },
+  "usage": { "prompt_tokens": 850, "completion_tokens": 410, "total_tokens": 1260 }
+}</code></pre>
+        </div>
+
+        <!-- 7.11 Error Contracts -->
+        <div class="ss">
+            <div class="ssh">
+                <span class="sn" style="background:#64748b">ERROR</span>
+                <h3>7.11 Standard Error JSON Response Contract (400 / 401 / 404 / 429 / 500)</h3>
+            </div>
+            <p><strong>🎯 Fungsi Endpoint:</strong> Format baku payload JSON Error yang dikembalikan jika permintaan gagal diproses oleh server Gateway.</p>
+
+<pre><span class="lb json">Standard Error Response JSON Format</span><code>{
+  "error": {
+    "code": "SESSION_NOT_FOUND",
+    "message": "Session ID 'api_999999' not found on Hermes Gateway server",
+    "status": 404,
+    "timestamp": "2026-08-06T14:45:00Z"
+  }
+}</code></pre>
         </div>
     </div>
 
-    <!-- SECTION 8: POSTMAN COLLECTION IMPORT -->
+    <!-- SECTION 8: POSTMAN COLLECTION IMPORT & DOWNLOAD -->
     <div class="sc" id="sec-dev-postman">
         <div class="sh">
             <div class="ib am">📬</div>
             <div class="stg">
-                <h2>8. Panduan Impor Postman Collection</h2>
-                <p>4 langkah mudah menggunakan Postman Collection EKSAD Hermes.</p>
+                <h2>8. Unduh &amp; Impor Postman Collection (Siap Pakai)</h2>
+                <p>Unduh file Postman Collection resmi yang sudah berisi seluruh endpoint dan contoh JSON Response tersimpan.</p>
+            </div>
+        </div>
+
+        <!-- Download Banner Card -->
+        <div style="background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(99,102,241,0.15)); border: 1px solid var(--border-highlight); border-radius: 16px; padding: 24px; margin-bottom: 24px; text-align: center;">
+            <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 8px;">📥 Download Postman Collection (.json)</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Klik tombol di bawah ini untuk mendownload Postman Collection JSON lengkap dengan seluruh variabel (<code>{{base_url}}</code>, <code>{{api_key}}</code>, <code>{{session_id}}</code>) dan contoh respon tersimpan di Postman.
+            </p>
+            
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="../collections/Hermes_Agent_Gateway_Master_Collection.postman_collection.json" download class="btn-download" style="background: linear-gradient(90deg, #06b6d4, #3b82f6); color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(6,182,212,0.4); transition: transform 0.2s ease;">
+                    <span>⚡ Unduh Master Gateway Collection (.json)</span>
+                </a>
             </div>
         </div>
 
@@ -617,36 +1155,29 @@
             <div class="fst">
                 <div class="num2 pu">1</div>
                 <div class="sb2">
-                    <div class="st2">Unduh / Buka File Collection JSON</div>
-                    <p>File collection siap pakai berada di repositori:</p>
-                    <ul>
-                        <li><strong>System Analyst (SA):</strong> <code>hermes-documentation/system-analyst/Hermes_System_Analyst_Postman_Collection.json</code></li>
-                        <li><strong>Business Analyst (BA):</strong> <code>hermes-documentation/business-analyst/Hermes_Business_Analyst_Postman_Collection.json</code></li>
-                    </ul>
+                    <div class="st2">Unduh File Collection JSON</div>
+                    <p>Klik tombol unduh di atas untuk mengunduh file <code>Hermes_Agent_Gateway_Master_Collection.postman_collection.json</code>.</p>
                 </div>
             </div>
-
             <div class="fst">
-                <div class="num2 em">2</div>
+                <div class="num2 pu">2</div>
                 <div class="sb2">
-                    <div class="st2">Buka Aplikasi Postman &amp; Klik "Import"</div>
-                    <p>Buka Postman Desktop, klik tombol <strong>Import</strong> di pojok kiri atas, lalu Drag &amp; Drop file JSON tersebut.</p>
+                    <div class="st2">Buka Aplikasi Postman &amp; Klik 'Import'</div>
+                    <p>Buka Postman Desktop / Web, pilih menu <strong>Import</strong> di sudut kiri atas, lalu seret file JSON yang telah diunduh.</p>
                 </div>
             </div>
-
             <div class="fst">
-                <div class="num2 cy">3</div>
+                <div class="num2 pu">3</div>
                 <div class="sb2">
-                    <div class="st2">Otomatisasi Environment Variables</div>
-                    <p>Variabel <code>baseUrl</code> (http://203.145.34.37:8643) dan <code>apiKey</code> (Bearer Token) sudah terkonfigurasi otomatis dalam collection!</p>
+                    <div class="st2">Set Environment Variables</div>
+                    <p>Isi variabel <code>base_url</code> (<code>http://203.145.34.37:8643</code>) dan <code>api_key</code> dengan token server Anda.</p>
                 </div>
             </div>
-
             <div class="fst">
-                <div class="num2 am">4</div>
+                <div class="num2 pu">4</div>
                 <div class="sb2">
-                    <div class="st2">Jalankan Request &amp; Test Endpoint</div>
-                    <p>Jalankan <code>Health Check</code>, <code>Create Session</code>, dan <code>Send Chat</code> langsung dari Postman!</p>
+                    <div class="st2">Jalankan Request &amp; Tes Endpoint</div>
+                    <p>Seluruh endpoint siap dieksekusi dan Anda dapat langsung melihat contoh JSON Response tersimpan pada tab <strong>Saved Responses</strong> di Postman.</p>
                 </div>
             </div>
         </div>

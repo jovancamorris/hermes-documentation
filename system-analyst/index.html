@@ -491,12 +491,12 @@ scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_na
 
     <!-- Section 3: Detailed Request & Response JSON Code Examples -->
     <section class="section-card">
-        <h2>Contoh Payload Request &amp; Response JSON per Endpoint</h2>
-        <p>Contoh nyata format JSON Request Payload dan Response Payload yang dikembalikan oleh Gateway System Analyst (Port 8643):</p>
+        <h2>Contoh Payload Request &amp; Response JSON Lengkap per Endpoint (System Analyst Gateway - Port 8643)</h2>
+        <p>Format nyata JSON Request Payload dan Response Payload (termasuk status 200 OK, 201 Created, SSE streaming, &amp; 400/404/500 error contracts) yang dikembalikan oleh Gateway System Analyst (Port 8643):</p>
 
         <!-- Request 1 -->
         <div class="req-card">
-            <div class="req-title">1. GET /v1/models (Health Check)</div>
+            <div class="req-title">1. GET /v1/models (Model Discovery &amp; Server Health Check)</div>
 <pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
   "object": "list",
   "data": [
@@ -505,7 +505,7 @@ scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_na
       "object": "model",
       "created": 1785212000,
       "owned_by": "eksad-hermes-gateway",
-      "meta": { "provider": "MiniMax", "model_name": "MiniMax-M2", "port": 8643 }
+      "meta": { "provider": "MiniMax", "model_name": "MiniMax-M2", "port": 8643, "role": "System Analyst" }
     }
   ]
 }</code></pre>
@@ -513,7 +513,7 @@ scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_na
 
         <!-- Request 2 -->
         <div class="req-card">
-            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat)</div>
+            <div class="req-title">2. POST /v1/chat/completions (Stateless Chat - OpenAI Compatible)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
   "model": "system-analyst",
   "messages": [
@@ -540,47 +540,127 @@ scp -r eksadpro@203.145.34.37:/home/eksadpro/projects/{project_name}/{service_na
 
         <!-- Request 3 -->
         <div class="req-card">
-            <div class="req-title">3. POST /api/sessions (Create New Session)</div>
+            <div class="req-title">3. POST /api/sessions (Create New Stateful Session)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
   "title": "Session Jovan - TSD User Management Service Design",
   "model": "system-analyst",
-  "user_context": { "user_id": "USR-10293", "username": "jovan_sa", "role": "System Analyst" }
+  "user_id": "USR-10293",
+  "user_context": { 
+    "user_id": "USR-10293", 
+    "username": "jovan_sa", 
+    "role": "System Analyst",
+    "db_type": "PostgreSQL",
+    "messaging": "RabbitMQ",
+    "framework": "Quarkus 3.30.6 Reactive"
+  }
 }</code></pre>
 <pre><span class="code-label lbl-res">JSON Response (201 Created)</span><code>{
   "status": "success",
   "session_id": "api_1785212211_12b5637c",
   "title": "Session Jovan - TSD User Management Service Design",
-  "created_at": 1785212211
+  "user_id": "USR-10293",
+  "created_at": "2026-08-06T14:32:00Z"
 }</code></pre>
         </div>
 
         <!-- Request 4 -->
         <div class="req-card">
-            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session)</div>
+            <div class="req-title">4. POST /api/sessions/{session_id}/chat (Send Chat to Session - Non Stream)</div>
 <pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
   "message": "Tolong buatkan DDL Flyway SQL untuk tabel user_account dan user_role sesuai standar EKSAD (termasuk 7 audit columns wajib & soft delete).",
-  "user_context": { "user_id": "USR-10293" }
+  "stream": false,
+  "user_id": "USR-10293"
 }</code></pre>
 <pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "object": "hermes.session.chat.completion",
   "session_id": "api_1785212211_12b5637c",
   "message_id": "msg_998231",
-  "role": "assistant",
-  "content": "-- Flyway DDL Script: V1__init_user_schema.sql\nCREATE TABLE user_account (\n    id VARCHAR(64) PRIMARY KEY,\n    username VARCHAR(100) NOT NULL,\n    email VARCHAR(150) NOT NULL,\n    tenant_id VARCHAR(64) NOT NULL,\n    created_at BIGINT NOT NULL,\n    created_by VARCHAR(100) NOT NULL,\n    updated_at BIGINT NOT NULL,\n    updated_by VARCHAR(100) NOT NULL,\n    deleted_at BIGINT DEFAULT 0,\n    deleted_by VARCHAR(100)\n);",
+  "message": {
+    "role": "assistant",
+    "content": "-- Flyway DDL Script: V1__init_user_schema.sql\nCREATE TABLE user_account (\n    id VARCHAR(64) PRIMARY KEY,\n    username VARCHAR(100) NOT NULL,\n    email VARCHAR(150) NOT NULL,\n    created_at BIGINT NOT NULL,\n    created_by VARCHAR(100) NOT NULL,\n    updated_at BIGINT NOT NULL,\n    updated_by VARCHAR(100) NOT NULL,\n    deleted_at BIGINT DEFAULT 0,\n    deleted_by VARCHAR(100),\n    is_deleted BOOLEAN DEFAULT FALSE\n);"
+  },
   "usage": { "prompt_tokens": 1420, "completion_tokens": 530, "total_tokens": 1950 }
 }</code></pre>
         </div>
 
         <!-- Request 5 -->
         <div class="req-card">
-            <div class="req-title">5. GET /api/sessions/{session_id}/messages (Get Session Messages History)</div>
-<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+            <div class="req-title">5. POST /api/sessions/{session_id}/chat (Real-Time SSE Streaming - stream: true)</div>
+<pre><span class="code-label lbl-req">JSON Request Payload</span><code>{
+  "message": "Buatkan skenario RabbitMQ Topology (Exchanges, Queues, Routing Keys) untuk event UserCreatedEvent.",
+  "stream": true,
+  "user_id": "USR-10293"
+}</code></pre>
+<pre><span class="code-label lbl-res">Server Response Stream Chunks (text/event-stream)</span><code>data: {"id":"msg_102","choices":[{"delta":{"role":"assistant"}}]}
+
+data: {"id":"msg_102","choices":[{"delta":{"content":"### RabbitMQ Topology Specs\nExchange: eksad.user.events (Topic)\nRouting Key: user.account.created"}}]}
+
+data: [DONE]</code></pre>
+        </div>
+
+        <!-- Request 6 -->
+        <div class="req-card">
+            <div class="req-title">6. GET /api/sessions/{session_id}/messages?order=desc (Get Session Messages History)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK - Sorted Descending: Terbaru &rarr; Terlama)</span><code>{
   "session_id": "api_1785212211_12b5637c",
   "total_messages": 2,
-  "accumulated_usage": { "total_prompt_tokens": 1545, "total_completion_tokens": 810, "total_tokens": 2355 },
+  "order": "desc",
   "messages": [
-    { "id": "msg_1", "role": "user", "content": "Tolong buatkan DDL Flyway SQL...", "timestamp": 1785212211 },
-    { "id": "msg_2", "role": "assistant", "content": "-- Flyway DDL Script: V1__init_user_schema.sql...", "timestamp": 1785212215 }
+    { 
+      "id": "msg_998231", 
+      "role": "assistant", 
+      "content": "-- Flyway DDL Script: V1__init_user_schema.sql...", 
+      "timestamp": "2026-08-06T14:33:10Z" 
+    },
+    { 
+      "id": "msg_998230", 
+      "role": "user", 
+      "content": "Tolong buatkan DDL Flyway SQL untuk tabel user_account...", 
+      "timestamp": "2026-08-06T14:33:05Z" 
+    }
   ]
+}</code></pre>
+        </div>
+
+        <!-- Request 7 -->
+        <div class="req-card">
+            <div class="req-title">7. GET /api/sessions?user_id={user_id}&amp;order=desc (List Active Sessions Filtered)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "status": "success",
+  "total": 1,
+  "user_id": "USR-10293",
+  "sessions": [
+    {
+      "session_id": "api_1785212211_12b5637c",
+      "title": "Session Jovan - TSD User Management Service Design",
+      "message_count": 4,
+      "created_at": "2026-08-06T14:32:00Z",
+      "updated_at": "2026-08-06T14:35:10Z"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <!-- Request 8 -->
+        <div class="req-card">
+            <div class="req-title">8. DELETE /api/sessions/{session_id} (Delete Session)</div>
+<pre><span class="code-label lbl-res">JSON Response (200 OK)</span><code>{
+  "status": "success",
+  "message": "Session api_1785212211_12b5637c has been deleted successfully",
+  "session_id": "api_1785212211_12b5637c"
+}</code></pre>
+        </div>
+
+        <!-- Request 9 -->
+        <div class="req-card">
+            <div class="req-title">9. Standard Error JSON Contract (400 Bad Request / 401 / 404 / 500)</div>
+<pre><span class="code-label lbl-res">JSON Error Response (404 Not Found / 401 Unauthorized)</span><code>{
+  "error": {
+    "code": "SESSION_NOT_FOUND",
+    "message": "Session ID 'api_999999' not found on Hermes Gateway server",
+    "status": 404,
+    "timestamp": "2026-08-06T14:45:00Z"
+  }
 }</code></pre>
         </div>
     </section>

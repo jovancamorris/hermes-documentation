@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "5c0beb9f-878b-4ed5-8191-b1057c54db43",
-    "name": "Hermes Gateway API Collection - BA",
+    "_postman_id": "70cdfa6d-bf99-43eb-a39b-354d3c90de62",
+    "name": "Hermes Gateway API Collection - SA",
     "description": "Postman collection for the Hermes Agent Gateway API Server (Hermes Agent v0.19.0 (2026.7.20), upstream 8c36cd46, profile `system-analyst`).\n\nBase URL: http://HOST:8643\nAuth: Bearer token using API_SERVER_KEY\n\nGenerated from HERMES_GATEWAY_API_COLLECTION.md (generated at 2026-07-29T09:30:34+00:00).\n\nSet the collection variables HERMES_BASE_URL and HERMES_API_KEY before running requests. Always re-verify against GET /v1/capabilities after a Hermes upgrade, since this document describes only the currently installed gateway's API surface, not a generic promise for every release.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "26906980",
-    "_collection_link": "https://go.postman.co/collection/26906980-5c0beb9f-878b-4ed5-8191-b1057c54db43?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/26906980-70cdfa6d-bf99-43eb-a39b-354d3c90de62?source=collection_link"
   },
   "item": [
     {
@@ -1296,14 +1296,6 @@
         }
       ],
       "description": "/api/jobs \u2014 schedule, manage, pause/resume, and manually trigger cron-based agent jobs. Operational but version-sensitive (jobs_admin capability flag is currently false)."
-    },
-    {
-      "name": "New Request",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
     }
   ],
   "auth": {
@@ -1329,12 +1321,12 @@
     },
     {
       "key": "HERMES_MODEL",
-      "value": "business-analyst",
+      "value": "system-analyst",
       "type": "string"
     },
     {
       "key": "session_id",
-      "value": "ba-analysis-001",
+      "value": "sa-analysis-001",
       "type": "string"
     },
     {

@@ -1,0 +1,1232 @@
+{
+  "info": {
+    "_postman_id": "ab865776-b45b-4adb-9f5a-11bfdd9975b7",
+    "name": "Hermes Gateway API Collection",
+    "description": "Postman collection for the Hermes Agent Gateway API Server (Hermes Agent v0.19.0 (2026.7.20), upstream 8c36cd46, profile `system-analyst`).\n\nBase URL: http://HOST:8643\nAuth: Bearer token using API_SERVER_KEY\n\nGenerated from HERMES_GATEWAY_API_COLLECTION.md (generated at 2026-07-29T09:30:34+00:00).\n\nSet the collection variables HERMES_BASE_URL and HERMES_API_KEY before running requests. Always re-verify against GET /v1/capabilities after a Hermes upgrade, since this document describes only the currently installed gateway's API surface, not a generic promise for every release.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{HERMES_API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [],
+  "variable": [
+    {
+      "key": "HERMES_BASE_URL",
+      "value": "http://203.145.34.37:8643",
+      "type": "string"
+    },
+    {
+      "key": "HERMES_API_KEY",
+      "value": "replace-with-api-server-key",
+      "type": "string"
+    },
+    {
+      "key": "HERMES_MODEL",
+      "value": "business-analyst",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "ba-analysis-001",
+      "type": "string"
+    },
+    {
+      "key": "run_id",
+      "value": "run_1234567890abcdef",
+      "type": "string"
+    },
+    {
+      "key": "response_id",
+      "value": "resp_1234567890abcdef",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "abcdef123456",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Discovery",
+      "item": [
+        {
+          "name": "Basic Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/health",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Basic health check. No authentication required.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Health (v1 alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/health",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "health"
+              ]
+            },
+            "description": "Alias of /health. No authentication required.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Detailed Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/health/detailed",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "health",
+                "detailed"
+              ]
+            },
+            "description": "Detailed gateway readiness, platforms, process, and active agents."
+          }
+        },
+        {
+          "name": "List Models",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/models",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "models"
+              ]
+            },
+            "description": "List advertised virtual model and configured route aliases."
+          }
+        },
+        {
+          "name": "Model Options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/model/options?refresh=false",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "model",
+                "options"
+              ],
+              "query": [
+                {
+                  "key": "refresh",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Provider/model picker inventory. Use refresh=true only when the client needs refreshed provider catalogs or pricing."
+          }
+        },
+        {
+          "name": "Capabilities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/capabilities",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "capabilities"
+              ]
+            },
+            "description": "Machine-readable API capability contract. Always query this after an upgrade."
+          }
+        },
+        {
+          "name": "List Skills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/skills",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "skills"
+              ]
+            },
+            "description": "List skills visible to the API-server agent."
+          }
+        },
+        {
+          "name": "List Toolsets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/toolsets",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "toolsets"
+              ]
+            },
+            "description": "List toolsets and resolved tools."
+          }
+        }
+      ],
+      "description": "No-auth basic health checks plus bearer-authenticated discovery routes (models, capabilities, skills, toolsets)."
+    },
+    {
+      "name": "2. Session Resources",
+      "item": [
+        {
+          "name": "List Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions?limit=50&offset=0&source=api_server&include_children=false",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "source",
+                  "value": "api_server"
+                },
+                {
+                  "key": "include_children",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "List persisted sessions.\n\nQuery parameters:\n- limit: default 50, max 200\n- offset: default 0, max 1,000,000\n- source: optional source filter\n- include_children: include forked child sessions (default false)"
+          }
+        },
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            },
+            "description": "Create an empty session. `id` is optional; Hermes generates one when omitted. `session_id` is accepted as an alias for `id`.\n\nExample response:\n```json\n{\n  \"object\": \"hermes.session\",\n  \"session\": {\n    \"id\": \"sa-analysis-001\",\n    \"source\": \"eksad-portal\",\n    \"model\": \"system-analyst\",\n    \"title\": \"Requirement Analysis\"\n  }\n}\n```",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"sa-analysis-001\",\n  \"title\": \"Requirement Analysis\",\n  \"source\": \"eksad-portal\",\n  \"model\": \"system-analyst\",\n  \"system_prompt\": \"Focus on technical requirement analysis and EKSAD architecture standards.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}"
+              ]
+            },
+            "description": "Get session metadata."
+          }
+        },
+        {
+          "name": "Update Session",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}"
+              ]
+            },
+            "description": "Update title or end reason. Only `title` and `end_reason` are accepted.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Procurement Requirement Analysis\",\n  \"end_reason\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}"
+              ]
+            },
+            "description": "Delete session."
+          }
+        },
+        {
+          "name": "Get Session Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/messages",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "messages"
+              ]
+            },
+            "description": "Get persisted session messages."
+          }
+        },
+        {
+          "name": "Fork Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/fork",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "fork"
+              ]
+            },
+            "description": "Fork session with existing transcript. The child session receives the existing transcript and references the source session as its parent.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"sa-analysis-001-alternative\",\n  \"title\": \"Alternative Architecture\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Chat - Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Hermes-Session-Key",
+                "value": "tenant-001:user-001:analysis",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            },
+            "description": "Execute one synchronous agent turn with plain text.\n\nExample response shape:\n```json\n{\n  \"object\": \"hermes.session.chat.completion\",\n  \"session_id\": \"sa-analysis-001\",\n  \"message\": {\n    \"role\": \"assistant\",\n    \"content\": \"Hasil analisis...\"\n  },\n  \"usage\": {\n    \"input_tokens\": 0,\n    \"output_tokens\": 0,\n    \"total_tokens\": 0\n  },\n  \"runtime\": {\n    \"provider\": \"openai-codex\",\n    \"model\": \"gpt-5.6-sol\"\n  }\n}\n```",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Analisis requirement berikut dan identifikasi risiko teknisnya.\",\n  \"instructions\": \"Jawab dalam Bahasa Indonesia.\",\n  \"model\": \"system-analyst\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Chat - One Inline Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            },
+            "description": "Session chat with a single inline Base64 image. Base64 encoding increases request size (limit 10,000,000 bytes); prefer an HTTP/HTTPS object-storage URL for large images.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Analisis diagram berikut.\"\n    },\n    {\n      \"type\": \"image_url\",\n      \"image_url\": {\n        \"url\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...\",\n        \"detail\": \"high\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Chat - Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            },
+            "description": "Session chat with multiple image_url parts referencing hosted images.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Bandingkan diagram arsitektur saat ini dengan rancangan target.\"\n    },\n    {\n      \"type\": \"image_url\",\n      \"image_url\": {\n        \"url\": \"https://storage.example.com/tenant-001/current-architecture.png\",\n        \"detail\": \"high\"\n      }\n    },\n    {\n      \"type\": \"image_url\",\n      \"image_url\": {\n        \"url\": \"https://storage.example.com/tenant-001/target-architecture.png\",\n        \"detail\": \"high\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Chat - Text + Images + Extracted DOCX Text (Recommended Multi-Artifact Pattern)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat"
+              ]
+            },
+            "description": "Hermes has NO native file upload / Files API and rejects `input_file`/`file_id` content (HTTP 400 `unsupported_content_type`). This is the recommended production pattern: the application extracts DOCX/PDF text itself and sends it as plain text alongside image_url parts, since Hermes only officially accepts text and images inline.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Analisis seluruh artefak berikut sebagai satu requirement package.\\n\\nDOCX metadata:\\n- file_id: file-docx-001\\n- tenant_id: tenant-001\\n- file_name: Procurement_BRD.docx\\n- mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\\n\\nDOCX extracted content:\\n--- BEGIN DOCUMENT ---\\n1. Business objective: Digital procurement approval.\\n2. Actors: Requester, Approver, Procurement Admin.\\n3. Requirement: Multi-level approval based on transaction amount.\\n--- END DOCUMENT ---\\n\\nBandingkan isi dokumen dengan dua diagram terlampir, lalu buat gap analysis.\"\n    },\n    {\n      \"type\": \"image_url\",\n      \"image_url\": {\n        \"url\": \"https://storage.example.com/tenant-001/process-current.png\",\n        \"detail\": \"high\"\n      }\n    },\n    {\n      \"type\": \"image_url\",\n      \"image_url\": {\n        \"url\": \"https://storage.example.com/tenant-001/process-target.png\",\n        \"detail\": \"high\"\n      }\n    }\n  ],\n  \"instructions\": \"Gunakan Bahasa Indonesia dan pisahkan temuan menjadi functional gap, data gap, integration gap, dan security gap.\",\n  \"model\": \"system-analyst\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Chat (Streaming)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/chat/stream",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "chat",
+                "stream"
+              ]
+            },
+            "description": "Execute one turn and stream SSE events (text/event-stream). Event names can include message deltas, tool progress, final completion, error, and approval-related lifecycle events.\n\nIn Postman, disable response redirects and inspect the raw stream, or use a client that supports SSE.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Buat ringkasan teknis requirement ini.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Session Model Lock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/sessions/{{session_id}}/model",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{session_id}}",
+                "model"
+              ]
+            },
+            "description": "Persist and acknowledge a model/provider lock. Use this when a client must persist an explicit provider/model runtime selection.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"openai-codex\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_options\": {\n    \"reasoning_effort\": \"high\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "description": "Persistent Hermes sessions: CRUD, forking, synchronous/streaming chat, model lock, and multimodal chat patterns (images, extracted DOCX text)."
+    },
+    {
+      "name": "3. OpenAI Chat Completions API",
+      "item": [
+        {
+          "name": "Chat Completions - Non-Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Hermes-Session-Id",
+                "value": "openai-session-001",
+                "type": "text"
+              },
+              {
+                "key": "X-Hermes-Session-Key",
+                "value": "tenant-001:user-001",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            },
+            "description": "OpenAI Chat Completions-compatible request. `X-Hermes-Session-Id` continues a conversation; `X-Hermes-Session-Key` sets a stable long-term memory scope.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Jawab dalam Bahasa Indonesia.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Jelaskan capability Hermes Gateway.\"\n    }\n  ],\n  \"stream\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Chat Completions - Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            },
+            "description": "OpenAI Chat Completions-compatible streaming request (SSE, text/event-stream).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Buat ringkasan arsitektur dalam lima poin.\"\n    }\n  ],\n  \"stream\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Chat Completions - Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/chat/completions",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "chat",
+                "completions"
+              ]
+            },
+            "description": "OpenAI Chat Completions-compatible request with multiple images in one content array.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Bandingkan kedua diagram.\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://storage.example.com/current.png\",\n            \"detail\": \"high\"\n          }\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://storage.example.com/target.png\",\n            \"detail\": \"high\"\n          }\n        }\n      ]\n    }\n  ],\n  \"stream\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "description": "POST /v1/chat/completions \u2014 OpenAI Chat Completions-compatible endpoint (streaming and non-streaming, text and image content)."
+    },
+    {
+      "name": "4. OpenAI Responses API",
+      "item": [
+        {
+          "name": "Create Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/responses",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "responses"
+              ]
+            },
+            "description": "OpenAI Responses-compatible request.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"instructions\": \"Jawab dalam Bahasa Indonesia.\",\n  \"input\": \"Identifikasi komponen utama untuk service approval workflow.\",\n  \"stream\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Continue Response (previous_response_id)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/responses",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "responses"
+              ]
+            },
+            "description": "Continue a prior response by referencing `previous_response_id`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"previous_response_id\": \"resp_1234567890abcdef\",\n  \"input\": \"Sekarang tambahkan risiko keamanan dan mitigasinya.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create Response - With Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/responses",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "responses"
+              ]
+            },
+            "description": "Responses API with an input_image content part. Note: `input_file` is rejected on this endpoint.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": \"Jelaskan diagram ini.\"\n        },\n        {\n          \"type\": \"input_image\",\n          \"image_url\": \"https://storage.example.com/architecture.png\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Stored Response",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/responses/{{response_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "responses",
+                "{{response_id}}"
+              ]
+            },
+            "description": "Retrieve a stored response."
+          }
+        },
+        {
+          "name": "Delete Stored Response",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/responses/{{response_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "responses",
+                "{{response_id}}"
+              ]
+            },
+            "description": "Delete a stored response."
+          }
+        }
+      ],
+      "description": "/v1/responses \u2014 OpenAI Responses-compatible endpoint, including continuation via previous_response_id and stored response retrieval/deletion."
+    },
+    {
+      "name": "5. Asynchronous Agent Runs",
+      "item": [
+        {
+          "name": "Start Run",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Hermes-Session-Key",
+                "value": "tenant-001:user-001:run",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/runs",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "runs"
+              ]
+            },
+            "description": "Start an agent run and immediately return a run_id (HTTP 202 Accepted).\n\nExample response:\n```json\n{\n  \"run_id\": \"run_1234567890abcdef\",\n  \"status\": \"started\"\n}\n```\n\nAccepts `conversation_history` as an array of {role, content} objects. If both `conversation_history` and `previous_response_id` are supplied, explicit `conversation_history` wins.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"system-analyst\",\n  \"session_id\": \"async-analysis-001\",\n  \"instructions\": \"Jawab dalam Bahasa Indonesia.\",\n  \"input\": \"Analisis requirement ini dan hasilkan daftar risiko teknis.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Poll Run",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/runs/{{run_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "runs",
+                "{{run_id}}"
+              ]
+            },
+            "description": "Poll run status.\n\nTypical statuses: queued, running, waiting_for_approval, completed, failed, stopping, cancelled."
+          }
+        },
+        {
+          "name": "Stream Run Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/runs/{{run_id}}/events",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "runs",
+                "{{run_id}}",
+                "events"
+              ]
+            },
+            "description": "Stream run lifecycle and tool events via SSE.\n\nTypical events: message.delta, approval.request, approval.responded, run.completed, run.failed, run.cancelled. Tool-progress events may also be emitted by the active agent."
+          }
+        },
+        {
+          "name": "Resolve Approval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/runs/{{run_id}}/approval",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "runs",
+                "{{run_id}}",
+                "approval"
+              ]
+            },
+            "description": "Resolve a pending dangerous-command approval. Allowed choices: once, session, always, deny. Aliases approve, approved, and allow map to once.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"choice\": \"once\",\n  \"resolve_all\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Stop Run",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/v1/runs/{{run_id}}/stop",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "runs",
+                "{{run_id}}",
+                "stop"
+              ]
+            },
+            "description": "Interrupt an active run."
+          }
+        }
+      ],
+      "description": "/v1/runs \u2014 start long-running agent turns without blocking the HTTP request, poll status, stream lifecycle events, resolve approvals, and stop runs."
+    },
+    {
+      "name": "6. Cron Jobs",
+      "item": [
+        {
+          "name": "List Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs?include_disabled=true",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs"
+              ],
+              "query": [
+                {
+                  "key": "include_disabled",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "List cron jobs.\n\nNote: routes are installed and operational, but the stable /v1/capabilities payload currently reports jobs_admin: false. Treat these routes as operational/version-sensitive rather than a permanent public compatibility contract."
+          }
+        },
+        {
+          "name": "Create Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs"
+              ]
+            },
+            "description": "Create cron job. Required fields: name, schedule. Max name length 200 chars; max prompt length 5,000 chars.\n\nSupported schedule examples:\n30m\nevery 2h\n0 9 * * *\n2026-08-01T09:00:00+07:00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Daily architecture reminder\",\n  \"schedule\": \"0 9 * * *\",\n  \"prompt\": \"Buat pengingat untuk meninjau technical design yang masih terbuka.\",\n  \"deliver\": \"local\",\n  \"skills\": [\n    \"eksad-tsd-design\"\n  ],\n  \"repeat\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Job",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}"
+              ]
+            },
+            "description": "Get one cron job. Job IDs must match 12 lowercase hexadecimal characters."
+          }
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}"
+              ]
+            },
+            "description": "Update cron job. Allowed fields: name, schedule, prompt, deliver, skills, skill, repeat, enabled.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedule\": \"0 10 * * *\",\n  \"enabled\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pause Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}/pause",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}",
+                "pause"
+              ]
+            },
+            "description": "Pause cron job."
+          }
+        },
+        {
+          "name": "Resume Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}/resume",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}",
+                "resume"
+              ]
+            },
+            "description": "Resume cron job."
+          }
+        },
+        {
+          "name": "Trigger Job Now",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}/run",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}",
+                "run"
+              ]
+            },
+            "description": "Trigger immediate execution."
+          }
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{HERMES_BASE_URL}}/api/jobs/{{job_id}}",
+              "host": [
+                "{{HERMES_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "{{job_id}}"
+              ]
+            },
+            "description": "Delete cron job."
+          }
+        }
+      ],
+      "description": "/api/jobs \u2014 schedule, manage, pause/resume, and manually trigger cron-based agent jobs. Operational but version-sensitive (jobs_admin capability flag is currently false)."
+    }
+  ]
+}
